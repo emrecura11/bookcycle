@@ -1,5 +1,6 @@
 
 
+import 'package:bookcycle/signup_page.dart';
 import 'package:flutter/material.dart';
 
 import 'basic_button.dart';
@@ -32,6 +33,7 @@ class LoginPage extends StatelessWidget{
                     Text(
                       'LOGIN',
                       style: TextStyle(
+                        fontFamily: 'LexendExa',
                         fontSize: 32,
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
@@ -74,6 +76,8 @@ class LoginPage extends StatelessWidget{
                         child: const Text(
                           'Forgot password?',
                           style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Kurale',
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
@@ -89,7 +93,7 @@ class LoginPage extends StatelessWidget{
                     //loginUser(context);
                     // Use the value of 'success' if needed
                   },
-                  buttonText: "Log in",
+                  buttonText: "Login",
                 ),
 
                 //not a member? Register now
@@ -99,23 +103,29 @@ class LoginPage extends StatelessWidget{
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>this,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => SignupPage()), // SignupPage'e yönlendirme yapılıyor
+                            );
+                          },
+                          child: Text(
+                            'Register now',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Kurale',
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        );
-                      },
-                      child: Text(
-                        'Register now',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                    ),
+                      ],
+                    )
+
                   ],
                 )
               ],
