@@ -1,10 +1,11 @@
 
 
-import 'package:bookcycle/signup_page.dart';
+import 'package:bookcycle/pages/signup_page.dart';
 import 'package:flutter/material.dart';
 
-import 'basic_button.dart';
-import 'basic_textfield.dart';
+import '../widgets/basic_button.dart';
+import '../widgets/basic_textfield.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatelessWidget{
   LoginPage({super.key});
@@ -90,8 +91,7 @@ class LoginPage extends StatelessWidget{
                 //sign in button
                 BasicButton(
                   onTap: () {
-                    //loginUser(context);
-                    // Use the value of 'success' if needed
+                    Navigator.push(context, MaterialPageRoute(builder:(context)=> HomePage()),);
                   },
                   buttonText: "Login",
                 ),

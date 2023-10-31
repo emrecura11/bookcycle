@@ -1,8 +1,8 @@
-import 'package:bookcycle/login_page.dart';
+import 'package:bookcycle/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
-import 'basic_button.dart';
-import 'basic_textfield.dart';
+import '../widgets/basic_button.dart';
+import '../widgets/basic_textfield.dart';
 
 class SignupPage extends StatelessWidget{
   SignupPage({super.key});
