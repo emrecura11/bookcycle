@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../widgets/basic_button.dart';
 import '../widgets/basic_textfield.dart';
+import '../widgets/bottomnavbar.dart';
 import 'home_page.dart';
 
 class ChangePassword extends StatelessWidget{
@@ -77,6 +78,7 @@ class ChangePassword extends StatelessWidget{
           ),
         ),
       ),
+      bottomNavigationBar: BottomNavBar(),
 
     );
 

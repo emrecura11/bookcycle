@@ -1,3 +1,4 @@
+import 'package:bookcycle/pages/change_location_page.dart';
 import 'package:bookcycle/pages/change_password_page.dart';
 import 'package:bookcycle/widgets/drawer_security.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +66,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) =>  ChangePassword()),
+                MaterialPageRoute(builder: (context) =>  ChangeLocation()),
               );
             },
           ),
