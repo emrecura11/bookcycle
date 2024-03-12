@@ -1,5 +1,6 @@
 import 'package:bookcycle/pages/change_location_page.dart';
 import 'package:bookcycle/pages/change_password_page.dart';
+import 'package:bookcycle/pages/edit_profile_page.dart';
 import 'package:bookcycle/widgets/drawer_security.dart';
 import 'package:flutter/material.dart';
 
@@ -57,18 +58,16 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
             icon: Icons.person,
             text: "Edit Profile",
             onTap: () {
-
-            },
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EditProfile()),
+              );
+            }
           ),
           buildDrawerItem(
             icon: Icons.security_rounded,
             text: "Security",
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  ChangeLocation()),
-              );
-            },
+            onTap: () => _showEditProfileBottomSheet(context),
           ),
 
 
@@ -113,4 +112,73 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
       ),
     );
   }
+}
+void _showEditProfileBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(20.0),
+        topRight: Radius.circular(20.0),),
+    ),
+    builder: (BuildContext context) {
+      return Container(
+        padding: EdgeInsets.all(20),
+        child: Wrap(
+          children: <Widget>[
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
+              child: Text(
+                'Security',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            const Divider(thickness: 2,),
+
+            ListTile(
+              leading: const Icon(
+                  Icons.location_on,
+                  color: Color(0xFF88C4A8)),
+              title: Text('Change Location'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>  ChangeLocation()),
+                );
+              },
+            ),
+            const Divider(thickness: 1,),
+
+            ListTile(
+              leading: const Icon(
+                  Icons.lock,
+                  color: Color(0xFF88C4A8)
+              ),
+              title: Text('Change Password'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>  ChangePassword()),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Widget buildDrawerItem({required IconData icon, required String text, required void Function() onTap}) {
+  return ListTile(
+    leading: Icon(icon),
+    title: Text(text),
+    onTap: onTap,
+  );
 }

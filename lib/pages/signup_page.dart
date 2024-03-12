@@ -13,7 +13,7 @@ class SignupPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEFECDC),
+      backgroundColor:  Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
