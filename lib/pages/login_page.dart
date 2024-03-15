@@ -14,7 +14,7 @@ class LoginPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEFECDC),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
@@ -110,10 +110,10 @@ class LoginPage extends StatelessWidget{
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => SignupPage()), // SignupPage'e yönlendirme yapılıyor
+                              MaterialPageRoute(builder: (context) => SignupPage()),
                             );
                           },
-                          child: Text(
+                          child: const Text(
                             'Register now',
                             style: TextStyle(
                               fontSize: 16,
