@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:bookcycle/widgets/basic_button.dart';
+import 'package:bookcycle/widgets/basic_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -117,14 +118,39 @@ class _EditProfileState extends State<EditProfile> {
               ),
             ),
             const SizedBox(height: 50,),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Description',
-                border: OutlineInputBorder(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: TextField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                  labelStyle: TextStyle(color: Colors.black),
+                  border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(),
+                  ),
+                ),
+                cursorColor: const Color(0xFF88C4A8),
+                maxLines: null,
               ),
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
+            ),
+            const SizedBox(height: 20,),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: TextField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  labelStyle: TextStyle(color: Colors.black),
+                  border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFF88C4A8)),
+                  ),
+                ),
+                cursorColor: const Color(0xFF88C4A8),
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+              ),
             ),
 
            const SizedBox(height: 20,),

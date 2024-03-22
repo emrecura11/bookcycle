@@ -87,7 +87,7 @@ class ProfilePage extends StatelessWidget {
                 children: const [
                   Icon(
                     Icons.location_on,
-                    color: Colors.teal,
+                    color: Color(0xFF88C4A8),
                   ),
                   Text(
                     "Antalya",
@@ -113,7 +113,7 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.messenger,
-                    color: Colors.teal,
+                    color: Color(0xFF88C4A8),
                   ),
                   BasicButton(
                       onTap:() {
@@ -146,7 +146,7 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
 
-              // ListView ekleyin
+              // ListView
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
