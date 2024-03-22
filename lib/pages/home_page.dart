@@ -14,10 +14,9 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: ListView(
         children: [
-          SizedBox(height: 50),
+          SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -175,4 +174,3 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-

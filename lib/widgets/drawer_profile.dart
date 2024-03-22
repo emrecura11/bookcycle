@@ -1,6 +1,7 @@
 import 'package:bookcycle/pages/change_location_page.dart';
 import 'package:bookcycle/pages/change_password_page.dart';
 import 'package:bookcycle/pages/edit_profile_page.dart';
+import 'package:bookcycle/pages/my_advertisements.dart';
 import 'package:bookcycle/widgets/drawer_security.dart';
 import 'package:flutter/material.dart';
 
@@ -75,7 +76,10 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
             icon: Icons.book,
             text: "My Advertisement",
             onTap: () {
-              // Handle My Advertisement tap
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyAdvertisements()),
+              );
             },
           ),
           buildDrawerItem(
