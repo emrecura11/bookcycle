@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bookcycle/pages/home_page.dart';
 import 'package:bookcycle/pages/profile_page.dart';
+import 'package:bookcycle/pages/addingBook_page.dart';
 
 class BottomNavBar extends StatefulWidget {
   @override
@@ -46,7 +47,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   final List<Widget> _pages = [
     HomePage(),
     HomePage(),
-    HomePage(),
+    AddBookPage(),
     HomePage(),
     ProfilePage(),
   ];
@@ -60,7 +61,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         ),
       ),
       child: BottomAppBar(
-        color: Colors.white,
+        color: const Color(0xFF88C4A8),
         child: Container(
           height: kToolbarHeight + 5,
           child: Row(

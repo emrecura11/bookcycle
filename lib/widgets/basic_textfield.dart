@@ -24,10 +24,10 @@ class BasicTextfield extends StatelessWidget{
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.grey.shade400),
             ),
-            fillColor: const Color(0xFFEFECDC),
+            fillColor: const Color(0xFFEAEAEA),
             filled: true,
             hintText: hintText,
-            hintStyle: const TextStyle(color:Colors.black26)
+            hintStyle: const TextStyle(color:Colors.black54)
         ),
       ),
 
