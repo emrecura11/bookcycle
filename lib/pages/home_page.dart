@@ -28,59 +28,61 @@ class HomePage extends StatelessWidget {
         ),
           padding: EdgeInsets.all(16.0),
           height:  MediaQuery.of(context).size.height*0.8 ,
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // İçerik boyutuna göre boyutlandır
-            children: <Widget>[
-              Text(
-                'Filter Books',
-                style: TextStyle(fontFamily: 'LexendExa',
-                  fontSize: 26.0,
-                  fontWeight: FontWeight.bold,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // İçerik boyutuna göre boyutlandır
+              children: <Widget>[
+                Text(
+                  'Filter Books',
+                  style: TextStyle(fontFamily: 'LexendExa',
+                    fontSize: 26.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              SingleChildScrollView(
-                child: FilterWidget(),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Color(0xFF88C4A8),
-                      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                    ),
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                SingleChildScrollView(
+                  child: FilterWidget(),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Color(0xFF88C4A8),
+                        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                       ),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop(); // BottomSheet'i kapat
-                    },
-                  ),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Color(0xFF88C4A8),
-                      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                    ),
-                    child: Text(
-                      'Apply',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // BottomSheet'i kapat
+                      },
                     ),
-                    onPressed: () {
-                      // Filtreleme uygulama işlevi
-                    },
-                  ),
-                ],
-              ),
-            ],
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Color(0xFF88C4A8),
+                        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                      ),
+                      child: Text(
+                        'Apply',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onPressed: () {
+                        // Filtreleme uygulama işlevi
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },

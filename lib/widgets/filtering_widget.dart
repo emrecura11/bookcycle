@@ -41,7 +41,7 @@ class _FilterWidgetState extends State<FilterWidget> {
             },
           )).toList(),
         ),
-        SizedBox(height: 25),
+        SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
@@ -103,7 +103,7 @@ class _FilterWidgetState extends State<FilterWidget> {
             ),
           ],
         ),
-        SizedBox(height: 25),
+        SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
@@ -155,7 +155,7 @@ class _FilterWidgetState extends State<FilterWidget> {
             );
           }).toList(),
         ),
-        SizedBox(height: 40),
+        SizedBox(height: 20),
       ],
     );
   }
