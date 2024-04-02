@@ -61,7 +61,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         ),
       ),
       child: BottomAppBar(
-        color: const Color(0xFF88C4A8),
+        color: Colors.white,
         child: Container(
           height: kToolbarHeight + 5,
           child: Row(

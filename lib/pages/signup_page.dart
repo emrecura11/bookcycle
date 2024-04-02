@@ -19,7 +19,7 @@ class SignupPage extends StatelessWidget{
           child: Center(
             child: Column(
               children: [
-                Image.asset('images/logo_bookcycle.jpeg',
+                Image.asset('images/logo.png',
                   height: MediaQuery.of(context).size.height * 0.4,
                   width: MediaQuery.of(context).size.width,
                   fit: BoxFit.cover,
