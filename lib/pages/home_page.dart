@@ -33,6 +33,7 @@ class HomePage extends StatelessWidget {
 
 
   void _showFilterDialog(BuildContext context) {
+    double height=MediaQuery.of(context).size.height*0.04;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -41,7 +42,7 @@ class HomePage extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-          color: Color(0xFFFDFDFD), // Arka plan rengi olarak açık mavi kullanıldı
+          color: Color(0xFFFDFDFD),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(15),
             topRight: Radius.circular(15),
@@ -54,8 +55,8 @@ class HomePage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min, // İçerik boyutuna göre boyutlandır
               children: <Widget>[
                 Text(
-                  'Filtre',
-                  style: TextStyle(fontFamily: 'LexendExa',
+                  'Filtreleme',
+                  style: TextStyle(
                     fontSize: 26.0,
                     fontWeight: FontWeight.bold,
                   ),
@@ -64,15 +65,15 @@ class HomePage extends StatelessWidget {
                   child: FilterWidget(),
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     TextButton(
                       style: TextButton.styleFrom(
-                        backgroundColor: Color(0xFF88C4A8),
+                        backgroundColor: Colors.deepOrange.shade300,
                         padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                       ),
                       child: Text(
-                        'İptal Et',
+                        'İptal',
                         style: TextStyle(
                           fontSize: 16.0,
                           color: Colors.white,
@@ -80,12 +81,13 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.of(context).pop(); // BottomSheet'i kapat
+                        Navigator.of(context).pop();
                       },
                     ),
+                    SizedBox(width: height),
                     TextButton(
                       style: TextButton.styleFrom(
-                        backgroundColor: Color(0xFF88C4A8),
+                        backgroundColor: Colors.deepOrange.shade300,
                         padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                       ),
                       child: Text(
@@ -97,7 +99,7 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        // Filtreleme uygulama işlevi
+
                       },
                     ),
                   ],
@@ -112,6 +114,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: ListView(
@@ -141,7 +144,7 @@ class HomePage extends StatelessWidget {
                   IconButton(
                     icon: Icon(Icons.search),
                     onPressed: () {
-                      // Arama işlemini başlatmak için bir diyalog veya yeni sayfa açabilirsiniz.
+
                     },
                   ),
                   IconButton(
