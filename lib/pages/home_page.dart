@@ -1,13 +1,34 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import '../widgets/bottomnavbar.dart';
 import '../widgets/filtering_widget.dart';
+import 'my_advertisements.dart';
 class HomePage extends StatelessWidget {
-  final List<String> kitapGorselleri = [
-    'images/book.jpg',
-    'images/book2.jpg',
-    'images/book3.jpg',
-    'images/book4.png',
-    'images/book1.jpg',
+  final List<Book> books = [
+    Book("Emre Cura","Book 1", "Emre Cura", "Biography", "07/2023", 'images/book.jpg',true),
+    Book("Gamze Gül Uçar","Hayattan Hikayeler", "Gamze Gül Uçar", "Historical", "07/2023", 'images/book1.jpg',false),
+    Book("Emre Cura","Book 3", "Emre Cura", "Biography", "07/2023", 'images/book2.jpg',true),
+    Book("Emre Cura","Book 4", "Dilara Aksoy", "Biography", "07/2023", 'images/book3.jpg',false),
+    Book("Emre Cura","Book 5", "Dilara Aksoy", "Biography", "07/2023", 'images/book4.png',false),
+    Book("Emre Cura","Book 1", "Emre Cura", "Biography", "07/2023", 'images/book.jpg',true),
+    Book("Emre Cura","Book 2", "Dilara Aksoy", "Historical", "07/2023", 'images/book1.jpg',true),
+    Book("Emre Cura","Book 3", "Emre Cura", "Biography", "07/2023", 'images/book2.jpg',true),
+    Book("Emre Cura","Book 4", "Dilara Aksoy", "Biography", "07/2023", 'images/book3.jpg',true),
+    Book("Emre Cura","Book 5", "Dilara Aksoy", "Biography", "07/2023", 'images/book4.png',true),
+
+  ];
+
+  final List<List<Color>> colorPairs = [
+    /*[Color(0xFFFFBA78), Colors.white],
+    [Color(0xFFFFCC84), Colors.white],
+    [Color(0xFFFFD991), Colors.white],
+    [Color(0xFFFFE69E), Colors.white],*/
+
+    [Color(0xFFee8959), Colors.white],
+    [Color(0xFFf4a261), Colors.white],
+    [Color(0xFFdda15e), Colors.white],
+    [Color(0xFFf26b21), Colors.white],
   ];
 
 
@@ -113,7 +134,7 @@ class HomePage extends StatelessWidget {
                       padding: const EdgeInsets.all(0.0),
                       child: TextField(
                         decoration: InputDecoration(
-                          hintText: 'Search Books...',
+                          hintText: 'Kitap Ara...',
                           contentPadding: EdgeInsets.all(10),
                           border: InputBorder.none,
                         ),
@@ -138,124 +159,99 @@ class HomePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 16, bottom: 8),
             child: Text(
-              'Most Popular',
+              'Tüm Kitaplar',
               style: TextStyle(fontFamily: 'LexendExa',fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 10),
           SizedBox(
-            height: 200,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: kitapGorselleri.length + 1, // Ekstra öğe ekleyin
-              itemBuilder: (BuildContext context, int index) {
-                if (index == kitapGorselleri.length) {
-                  // Ekstra öğe: "View All Books" butonu
-                  return Container(
-                    width: 135,
-                    height: 200,
-                    margin: EdgeInsets.symmetric(horizontal: 8),
-                    child: Center(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Burada "View All Books" butonuna tıklandığında yapılacak işlemi ekleyebilirsiniz.
-                          // Örneğin, tüm kitapları gösteren bir sayfaya yönlendirme yapabilirsiniz.
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: const Color(0xFF88C4A8), // Buton rengi
-                        ),
+          child: ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: books.length,
+            itemBuilder: (BuildContext context, int index) {
+              final gradientColors = colorPairs[index % colorPairs.length];
+
+              final gradient = LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: gradientColors,
+              );
+
+              return Card(
+                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5), // Horizontal ve vertical margin
+              elevation: 5, // gölge efekti
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              child: Container(
+              decoration: BoxDecoration(
+              gradient: gradient,
+              borderRadius: BorderRadius.circular(10), // Köşe yarıçapı
+              ),
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Expanded(
                         child: Container(
-                          alignment: Alignment.center,
-                          width: double.infinity, // Genişlik sınırsız
-                          child: Text(
-                            'View All Books',
-                            style: TextStyle(fontSize: 16),
-                            textAlign: TextAlign.center, // Metni tam ortaya almak için
+                          margin: EdgeInsets.all(8.0),
+                          child: ClipRRect(
+                            borderRadius:
+                                BorderRadius.horizontal(left: Radius.circular(8), right:Radius.circular(8)),
+                            child: Image.asset(
+                              books[index].imagePath,
+                              fit: BoxFit.cover, // Görseli kutuya sığdır
+                            ),
                           ),
                         ),
+                        flex: 1, // Görselin genişlik payını ayarla
                       ),
-                    ),
-                  );
-                } else {
-                  // Kitap görselleri
-                  return Container(
-                    width: 135,
-                    height: 200,
-                    margin: EdgeInsets.symmetric(horizontal: 8),
-                    child: Center(
-                      child: Image.asset(
-                        kitapGorselleri[index],
-                        width: 180,
-                        height: 200,
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
-          ),
-          SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.only(left: 16, bottom: 8),
-            child: Text(
-              'Most Favorite',
-              style: TextStyle(fontFamily: 'LexendExa',fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ),
-          SizedBox(height: 16),
-          SizedBox(
-            height: 200,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: kitapGorselleri.length + 1, // Ekstra öğe ekleyin
-              itemBuilder: (BuildContext context, int index) {
-                if (index == kitapGorselleri.length) {
-                  // Ekstra öğe: "View All Books" butonu
-                  return Container(
-                    width: 135,
-                    height: 200,
-                    margin: EdgeInsets.symmetric(horizontal: 8),
-                    child: Center(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Burada "View All Books" butonuna tıklandığında yapılacak işlemi ekleyebilirsiniz.
-                          // Örneğin, tüm kitapları gösteren bir sayfaya yönlendirme yapabilirsiniz.
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: const Color(0xFF88C4A8), // Buton rengi
-                        ),
-                        child: Container(
-                          alignment: Alignment.center,
-                          width: double.infinity, // Genişlik sınırsız
-                          child: Text(
-                            'View All Books',
-                            style: TextStyle(fontSize: 16),
-                            textAlign: TextAlign.center, // Metni tam ortaya almak için
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    books[index].title,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  if(books[index].isAskida)
+                                    Icon(Icons.volunteer_activism, color: Color(0xFF76C893),)
+                                  else
+                                    Icon(Icons.volunteer_activism_outlined, color: Color(0xFF76C893),)
+                                ],
+                              ),
+                              Text("Yazar: ${books[index].author}"),
+                              Text("Kategori: ${books[index].category}"),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Kullanıcı: ${books[index].user}"),
+                                  Text("Tarih: ${books[index].date}"),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
+                        flex: 3, // Metinlerin genişlik payı
                       ),
-                    ),
-                  );
-                } else {
-                  // Kitap görselleri
-                  return Container(
-                    width: 135,
-                    height: 200,
-                    margin: EdgeInsets.symmetric(horizontal: 8),
-                    child: Center(
-                      child: Image.asset(
-                        kitapGorselleri[index],
-                        width: 180,
-                        height: 200,
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
+                    ],
+                  ),
+                ),
+                ),
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ]),
       bottomNavigationBar: BottomNavBar(),
     );
   }
