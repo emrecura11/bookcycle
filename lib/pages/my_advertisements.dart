@@ -9,13 +9,15 @@ void main() {
 }
 
 class Book {
+  final String user;
   final String title;
   final String author;
   final String category;
   final String date;
   final String imagePath;
+  final bool isAskida;
 
-  Book(this.title, this.author,this.category, this.date, this.imagePath);
+  Book(this.user,this.title, this.author,this.category, this.date, this.imagePath, this.isAskida);
 }
 
 class MyApp extends StatelessWidget {
@@ -31,10 +33,10 @@ class MyAdvertisements extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Book> books = [
-    Book("Book 1", "Emre Cura", "Biyography", "07/2023", 'images/yarının_adamı_1.jpg'),
-    Book("Book 2", "Dilara Aksoy", "Biyography", "07/2023", 'images/yarının_adamı_2.jpg'),
-    Book("Book 3", "Emre Cura", "Biyography", "07/2023", 'images/yarının_adamı_1.jpg'),
-    Book("Book 4", "Dilara Aksoy", "Biyography", "07/2023", 'images/yarının_adamı_2.jpg'),
+    Book("Emre Cura","Book 1", "Emre Cura", "Biyography", "07/2023", 'images/yarının_adamı_1.jpg',true),
+    Book("Emre Cura","Book 2", "Dilara Aksoy", "Biyography", "07/2023", 'images/yarının_adamı_2.jpg',true),
+    Book("Emre Cura","Book 3", "Emre Cura", "Biyography", "07/2023", 'images/yarının_adamı_1.jpg',true),
+    Book("Emre Cura","Book 4", "Dilara Aksoy", "Biyography", "07/2023", 'images/yarının_adamı_2.jpg',true),
   ];
 
   @override

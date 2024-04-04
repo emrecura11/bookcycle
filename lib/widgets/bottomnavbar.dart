@@ -57,11 +57,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(color: Colors.black, width: 0.7),
+          top: BorderSide(color: Colors.black, width: 1),
         ),
       ),
       child: BottomAppBar(
-        color: const Color(0xFF88C4A8),
+        color: Colors.white,
         child: Container(
           height: kToolbarHeight + 5,
           child: Row(
