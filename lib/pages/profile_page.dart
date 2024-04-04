@@ -1,3 +1,4 @@
+import 'package:bookcycle/pages/bookDetails_page.dart';
 import 'package:bookcycle/widgets/basic_button.dart';
 import 'package:bookcycle/widgets/drawer_profile.dart';
 import 'package:flutter/material.dart';
@@ -197,7 +198,7 @@ class ProfilePage extends StatelessWidget {
                                         ),
                                       ),
 
-                                    onPressed:  () {},
+                                    onPressed:  () {Navigator.push(context, MaterialPageRoute(builder:(context)=> BookDetailsPage()),);},
                                     child: const Text('See more details'),
                                   ),
                                   Text("Date: ${books[index].date}"),
