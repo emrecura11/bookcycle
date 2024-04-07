@@ -13,6 +13,7 @@ class LoginPage extends StatelessWidget{
   final passwordController=TextEditingController();
   @override
   Widget build(BuildContext context) {
+    double height=MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -20,46 +21,47 @@ class LoginPage extends StatelessWidget{
           child: Center(
             child: Column(
               children: [
-                const SizedBox(height: 20,),
+                SizedBox(height: height*0.07),
                 Image.asset('images/logo.png',
                   height: MediaQuery.of(context).size.height * 0.4,
                   width: MediaQuery.of(context).size.width,
                   fit: BoxFit.cover,
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: height*0.04),
 
                 Stack(
                   children: const <Widget>[
                     // Solid text as fill.
                     Text(
-                      'LOGIN',
+                      'Hoşgeldiniz!',
                       style: TextStyle(
-                        fontFamily: 'LexendExa',
-                        fontSize: 32,
+                        fontSize: 34,
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 50),
+                SizedBox(height: height*0.04),
                 //welcome back!
 
                 //username textfield
                 BasicTextfield(
                   controller: emailController,
-                  hintText: 'Email',
                   obscureText: false,
+                  labelText:'Email' ,
+                  prefixIcon: Icon(Icons.email),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: height*0.02),
                 //password textfiled
                 BasicTextfield(
                   controller: passwordController,
-                  hintText: 'Password',
                   obscureText: true,
+                  labelText:'Şifre' ,
+                  prefixIcon: Icon(Icons.vpn_key),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height:height*0.02),
                 //forgot password
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -76,10 +78,9 @@ class LoginPage extends StatelessWidget{
                           );
                         },
                         child: const Text(
-                          'Forgot password?',
+                          'Şifremi Unuttum',
                           style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Kurale',
+                            fontSize: 14,
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
@@ -88,22 +89,22 @@ class LoginPage extends StatelessWidget{
                     ],
                   ),
                 ),
-                const SizedBox(height: 25),
+                SizedBox(height: height*0.07),
                 //sign in button
                 BasicButton(
                   onTap: () {
                     Navigator.push(context, MaterialPageRoute(builder:(context)=> HomePage()),);
                   },
-                  buttonText: "Login",
+                  buttonText: "Giriş",
                 ),
 
                 //not a member? Register now
-                const SizedBox(
-                  height: 20,
-                ),
+                SizedBox(height: height*0.02,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Text('Hesabınız yok mu?'),
+                    SizedBox(height: height*0.01),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -115,10 +116,9 @@ class LoginPage extends StatelessWidget{
                             );
                           },
                           child: const Text(
-                            'Register now',
+                            'Kayıt ol!',
                             style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Kurale',
+                              fontSize: 14,
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
