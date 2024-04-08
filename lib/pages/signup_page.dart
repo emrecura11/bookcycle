@@ -12,6 +12,7 @@ class SignupPage extends StatelessWidget{
   final passwordAgainController=TextEditingController();
   @override
   Widget build(BuildContext context) {
+    double height=MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor:  Colors.white,
       body: SafeArea(
@@ -26,14 +27,13 @@ class SignupPage extends StatelessWidget{
                 ),
 
 
-                const SizedBox(height: 15),
+                SizedBox(height:height*0.01),
                 Stack(
                   children: const <Widget>[
                     // Solid text as fill.
                     Text(
-                      'SIGN UP',
+                      'Kayıt ol',
                       style: TextStyle(
-                        fontFamily: 'LexendExa',
                         fontSize: 32,
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
@@ -41,37 +41,41 @@ class SignupPage extends StatelessWidget{
                     ),
                   ],
                 ),
-                const SizedBox(height: 25),
+                SizedBox(height:height*0.04),
 
 
 
                 //username textfield
                 BasicTextfield(
                   controller: usernameController,
-                  hintText: 'Username',
                   obscureText: false,
+                  labelText:'Kullanıcı Adı' ,
+                  prefixIcon: Icon(Icons.person),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height:height*0.01),
 
                 BasicTextfield(
                   controller: emailController,
-                  hintText: 'Email',
                   obscureText: false,
+                  labelText:'Email' ,
+                  prefixIcon: Icon(Icons.email),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height:height*0.01),
                 //password textfiled
                 BasicTextfield(
                   controller: passwordController,
-                  hintText: 'Password',
                   obscureText: true,
+                  labelText:'Şifre' ,
+                  prefixIcon: Icon(Icons.vpn_key),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height:height*0.01),
                 BasicTextfield(
                   controller: passwordAgainController,
-                  hintText: 'Password again',
                   obscureText: false,
+                  labelText:'Şifrenizi tekrar girin' ,
+                  prefixIcon: Icon(Icons.check_rounded,)
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height:height*0.04),
 
 
                 //sign in button
@@ -80,9 +84,9 @@ class SignupPage extends StatelessWidget{
                     //loginUser(context);
                     // Use the value of 'success' if needed
                   },
-                  buttonText: "Signup",
+                  buttonText: "Kayıt ol",
                 ),
-                const SizedBox(height: 15),
+                SizedBox(height:height*0.02),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -96,10 +100,9 @@ class SignupPage extends StatelessWidget{
                         );
                       },
                       child: Text(
-                        'I already have account!',
+                        'Hesabım var!',
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: 'Kurale',
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),

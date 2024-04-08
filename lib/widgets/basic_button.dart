@@ -24,7 +24,6 @@ class BasicButton extends StatelessWidget {
           child: Text(
             buttonText,
             style: const TextStyle(
-              fontFamily: 'Kurale',
               color: Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 16,
