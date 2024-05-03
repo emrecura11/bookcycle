@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../widgets/bottomnavbar.dart';
-import 'package:bookcycle/widgets/basic_button.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
 
 class AddBookPage extends StatefulWidget {
   @override
@@ -19,13 +21,11 @@ class _AddBookPageState extends State<AddBookPage> {
   File? galleryFile;
   final picker = ImagePicker();
   bool _isSuspended = false;
-  // Define list of items for drop downs
+
   final List<String> _genres = ['History', 'Fictional', 'Horror', 'Biography'];
   final List<String> _bookStates = ['New', 'Old', 'Worn'];
 
-  void _showPicker({
-    required BuildContext context,
-  }) {
+  void _showPicker({required BuildContext context}) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -55,9 +55,7 @@ class _AddBookPageState extends State<AddBookPage> {
     );
   }
 
-  Future getImage(
-      ImageSource img,
-      ) async {
+  Future getImage(ImageSource img,) async {
     final pickedFile = await picker.pickImage(source: img);
     XFile? xfilePick = pickedFile;
     setState(
@@ -65,19 +63,61 @@ class _AddBookPageState extends State<AddBookPage> {
         if (xfilePick != null) {
           galleryFile = File(pickedFile!.path);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
+          ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Nothing is selected')));
         }
       },
     );
   }
+  
+  Future<void> _addBook() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    _formKey.currentState!.save();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('jwtoken');
+
+    final apiUrl = Uri.parse('https://localhost:9001/api/v1/Book');
+
+    try {
+      final response = await http.post(
+        apiUrl,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'name': _bookName,
+          'author': _author,
+          'genre': _genre,
+          'stateOfBook': _bookState,
+          'description': _advertisementDescription,
+          'isAskida': _isSuspended,
+          'bookImage': galleryFile != null ? galleryFile!.path : null,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        // Book added successfully
+        print('Book added successfully');
+        // You can navigate to another page or show a success message here
+      } else {
+        // Book addition failed
+        print('Failed to add book: ${response.body}');
+        // You can show an error message here
+      }
+    } catch (e) {
+      print('Error adding book: $e');
+      // You can show an error message here
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: SingleChildScrollView(
-
         padding: const EdgeInsets.all(32.0),
         child: Form(
           key: _formKey,
@@ -86,7 +126,7 @@ class _AddBookPageState extends State<AddBookPage> {
             children: <Widget>[
               SizedBox(height: 70),
               GestureDetector(
-                onTap: () =>_showPicker(context: context),
+                onTap: () => _showPicker(context: context),
                 child: Container(
                   height: 250,
                   decoration: BoxDecoration(
@@ -102,21 +142,26 @@ class _AddBookPageState extends State<AddBookPage> {
                       ? Icon(
                     Icons.photo_library,
                     color: Colors.grey[600],
-                    size:60,
+                    size: 60,
                   )
-                      : null, // Resim seçilmediyse ikon göster, seçildiyse gösterme
+                      : null,
                 ),
-
               ),
               SizedBox(height: 40),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Book Name',labelStyle: TextStyle(color: Colors.black),),
+                decoration: InputDecoration(
+                  labelText: 'Book Name',
+                  labelStyle: TextStyle(color: Colors.black),
+                ),
                 onSaved: (value) => _bookName = value!,
               ),
               SizedBox(height: 40),
               DropdownButtonFormField(
                 value: _genre,
-                decoration: InputDecoration(labelText: 'Genre',labelStyle: TextStyle(color: Colors.black)),
+                decoration: InputDecoration(
+                  labelText: 'Genre',
+                  labelStyle: TextStyle(color: Colors.black),
+                ),
                 items: _genres.map((String value) {
                   return DropdownMenuItem(
                     value: value,
@@ -131,13 +176,19 @@ class _AddBookPageState extends State<AddBookPage> {
               ),
               SizedBox(height: 40),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Author',labelStyle: TextStyle(color: Colors.black)),
+                decoration: InputDecoration(
+                  labelText: 'Author',
+                  labelStyle: TextStyle(color: Colors.black),
+                ),
                 onSaved: (value) => _author = value!,
               ),
               SizedBox(height: 40),
               DropdownButtonFormField(
                 value: _bookState,
-                decoration: InputDecoration(labelText: 'State of the Book',labelStyle: TextStyle(color: Colors.black)),
+                decoration: InputDecoration(
+                  labelText: 'State of the Book',
+                  labelStyle: TextStyle(color: Colors.black),
+                ),
                 items: _bookStates.map((String value) {
                   return DropdownMenuItem(
                     value: value,
@@ -152,31 +203,31 @@ class _AddBookPageState extends State<AddBookPage> {
               ),
               SizedBox(height: 40),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Advertisement Description',labelStyle: TextStyle(color: Colors.black),),
+                decoration: InputDecoration(
+                  labelText: 'Advertisement Description',
+                  labelStyle: TextStyle(color: Colors.black),
+                ),
                 onSaved: (value) => _advertisementDescription = value!,
               ),
               SizedBox(height: 20),
               CheckboxListTile(
-                title: Text('Askıda Kitap Olsun'), // Checkbox yanındaki etiket
+                title: Text('Askıda Kitap Olsun'),
                 value: _isSuspended,
                 onChanged: (bool? newValue) {
                   setState(() {
                     _isSuspended = newValue!;
                   });
                 },
-                controlAffinity: ListTileControlAffinity.leading, // Checkbox'ı başa alır
-                // Diğer stil ayarlarınızı da burada yapabilirsiniz.
+                controlAffinity: ListTileControlAffinity.leading,
               ),
-              BasicButton(
-                onTap: () => Navigator.pop(context), // "save"
-                buttonText: "Upload",
+              ElevatedButton(
+                onPressed: _addBook,
+                child: Text('Upload'),
               ),
             ],
           ),
         ),
       ),
-        bottomNavigationBar: BottomNavBar(),
     );
   }
 }
-

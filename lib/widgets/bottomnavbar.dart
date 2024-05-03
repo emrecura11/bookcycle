@@ -1,3 +1,4 @@
+import 'package:bookcycle/pages/favorites_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bookcycle/pages/home_page.dart';
@@ -48,7 +49,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     HomePage(),
     HomePage(),
     AddBookPage(),
-    HomePage(),
+    FavoritesPage(),
     ProfilePage(),
   ];
 

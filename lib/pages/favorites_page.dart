@@ -1,37 +1,46 @@
-import 'package:bookcycle/widgets/basic_button.dart';
-import 'package:bookcycle/widgets/drawer_profile.dart';
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/Book.dart';
-import '../widgets/bottomnavbar.dart';
+import '../service/get_favorites.dart';
+import '../service/get_book_by_id.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-
-class MyApp extends StatelessWidget {
+class FavoritesPage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: MyAdvertisements(),
-    );
-  }
+  _FavoritesPageState createState() => _FavoritesPageState();
 }
 
-class MyAdvertisements extends StatelessWidget {
+class _FavoritesPageState extends State<FavoritesPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final List<Book> books = [
+  final List<int> bookIds = [];
+  final List<Book> books = [];
 
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadFavorites();
+  }
+
+  Future<void> _loadFavorites() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? email = prefs.getString('email');
+
+    try {
+      List<int> favoriteBookIds = await getFavorites(email!,bookIds);
+      for (int bookId in favoriteBookIds) {
+        Book? book = await getBookById(bookId);
+        if (book != null) {
+          setState(() {
+            books.add(book);
+          });
+        }
+      }
+    } catch (error) {
+      print('Error fetching favorites: $error');
+    }
+  }
 
   final List<List<Color>> colorPairs = [
-    /*[Color(0xFFFFBA78), Colors.white],
-    [Color(0xFFFFCC84), Colors.white],
-    [Color(0xFFFFD991), Colors.white],
-    [Color(0xFFFFE69E), Colors.white],*/
-
     [Color(0xFFee8959), Colors.white],
     [Color(0xFFf4a261), Colors.white],
     [Color(0xFFdda15e), Colors.white],
@@ -41,6 +50,7 @@ class MyAdvertisements extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Center(
@@ -48,28 +58,25 @@ class MyAdvertisements extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 50,),
-
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back, size: 24.0),
-                  ),
-
-                  const Padding(
-                    padding: EdgeInsets.only(left: 8.0),
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "My Advertisements",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+              SizedBox(height: 50),
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Icon(Icons.arrow_back, size: 24.0),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 8.0),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Favorilerim",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-
+                ),
+              ),
               SizedBox(
                 child: ListView.builder(
                   shrinkWrap: true,
@@ -77,21 +84,19 @@ class MyAdvertisements extends StatelessWidget {
                   itemCount: books.length,
                   itemBuilder: (BuildContext context, int index) {
                     final gradientColors = colorPairs[index % colorPairs.length];
-
                     final gradient = LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: gradientColors,
                     );
-
                     return Card(
-                      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5), // Horizontal ve vertical margin
-                      elevation: 5, // gölge efekti
+                      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      elevation: 5,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: gradient,
-                          borderRadius: BorderRadius.circular(10), // Köşe yarıçapı
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: IntrinsicHeight(
                           child: Row(
@@ -101,16 +106,14 @@ class MyAdvertisements extends StatelessWidget {
                                 child: Container(
                                   margin: EdgeInsets.all(8.0),
                                   child: ClipRRect(
-                                    borderRadius:
-                                    BorderRadius.horizontal(left: Radius.circular(8), right:Radius.circular(8)),
-                                    child: books[index].bookImage != null
-                                        ? Image.asset(
-                                      books[index].bookImage!,
+                                    borderRadius: BorderRadius.horizontal(left: Radius.circular(8), right: Radius.circular(8)),
+                                    child: Image.asset(
+                                      "/images/yarının_adamı_1",
                                       fit: BoxFit.cover,
-                                    ):Placeholder(),
+                                    ),
                                   ),
                                 ),
-                                flex: 1, // Görselin genişlik payını ayarla
+                                flex: 1,
                               ),
                               Expanded(
                                 child: Padding(
@@ -124,12 +127,12 @@ class MyAdvertisements extends StatelessWidget {
                                         children: [
                                           Text(
                                             books[index].name,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                             ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
-                                          if(books[index].isAskida)
+                                          if (books[index].isAskida)
                                             Icon(Icons.volunteer_activism, color: Color(0xFF76C893),)
                                           else
                                             Icon(Icons.volunteer_activism_outlined, color: Color(0xFF76C893),)
@@ -138,8 +141,7 @@ class MyAdvertisements extends StatelessWidget {
                                       Text("Yazar: ${books[index].author}"),
                                       Text("Kategori: ${books[index].genre}"),
                                       Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text("Kullanıcı: ${books[index].createdBy}"),
                                           Text("Tarih: ${books[index].created}"),
@@ -148,7 +150,7 @@ class MyAdvertisements extends StatelessWidget {
                                     ],
                                   ),
                                 ),
-                                flex: 3, // Metinlerin genişlik payı
+                                flex: 3,
                               ),
                             ],
                           ),
