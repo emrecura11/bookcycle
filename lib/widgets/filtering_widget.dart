@@ -102,7 +102,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                    style: TextStyle(fontSize: 16.0, color: Colors.white, fontWeight: FontWeight.bold),
                  ),
                  style: ElevatedButton.styleFrom(
-                   primary: Colors.deepOrange.shade300,
+                   backgroundColor: Colors.deepOrange.shade300,
                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                    elevation: 5,
                    padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
@@ -154,7 +154,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                    style: TextStyle(fontSize: 16.0, color: Colors.white, fontWeight: FontWeight.bold),
                  ),
                  style: ElevatedButton.styleFrom(
-                   primary: Colors.deepOrange.shade300,
+                   backgroundColor: Colors.deepOrange.shade300,
                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                    elevation: 5,
                    padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
