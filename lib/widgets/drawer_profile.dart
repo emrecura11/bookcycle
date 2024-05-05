@@ -99,7 +99,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
       padding: EdgeInsets.all(20.0),
       child: Container(
         decoration: BoxDecoration(
-          color: Color(0xFF88C4A8),
+          color: Colors.deepOrange.shade300,
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: ListTile(
@@ -144,9 +144,9 @@ void _showEditProfileBottomSheet(BuildContext context) {
             const Divider(thickness: 2,),
 
             ListTile(
-              leading: const Icon(
+              leading:  Icon(
                   Icons.location_on,
-                  color: Color(0xFF88C4A8)),
+                  color: Colors.deepOrange.shade300),
               title: Text('Change Location'),
               onTap: () {
                 Navigator.pop(context);
@@ -159,9 +159,9 @@ void _showEditProfileBottomSheet(BuildContext context) {
             const Divider(thickness: 1,),
 
             ListTile(
-              leading: const Icon(
+              leading:  Icon(
                   Icons.lock,
-                  color: Color(0xFF88C4A8)
+                  color: Colors.deepOrange.shade300
               ),
               title: Text('Change Password'),
               onTap: () {

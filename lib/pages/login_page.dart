@@ -1,5 +1,8 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../service/authentication.dart';
 import '../widgets/basic_textfield.dart';
 import 'home_page.dart';
 import 'signup_page.dart';
@@ -11,10 +14,96 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
+
+
+
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool rememberMe = false; // hatırlama durumunu tutacak değişken
+
+
+
+//login user method
+  Future<bool> loginUser(BuildContext context) async {
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+
+    if (EmailValidator.validate(email)) {
+      if (passwordController.text.isEmpty) {
+        // Parola boş ise hata mesajı göster
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              content: Text("Enter your password!"),
+              actions: [
+                ElevatedButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        return false;
+      }
+
+      bool isAuthenticated = await authenticateUserWithApi(email, password);
+
+      if (isAuthenticated) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('email', email);
+        prefs.setString('password', password);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+          ),
+        );
+
+        return true;
+      } else {
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Invalid email or password.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return false;
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Please enter a valid email.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,12 +252,7 @@ class _LoginPageState extends State<LoginPage> {
                         FadeInUp(duration: Duration(milliseconds: 1600),
                             child: MaterialButton(
                               onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>HomePage(),
-                                  ),
-                                );
+                                loginUser(context);
                               },
                               height: 50,
                               // margin: EdgeInsets.symmetric(horizontal: 50),

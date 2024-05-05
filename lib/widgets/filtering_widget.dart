@@ -255,4 +255,49 @@ class _FilterWidgetState extends State<FilterWidget> {
       ],
     );
   }
+  List<String> getSelectedGenres() {
+    List<String> selectedGenresList = [];
+    for (int i = 0; i < selectedGenres.length; i++) {
+      if (selectedGenres[i]) {
+        selectedGenresList.add(genres[i]);
+      }
+    }
+    return selectedGenresList;
+  }
+
+  String? getSelectedCity() {
+    return selectedCity;
+  }
+
+  DateTime? getSelectedStartDate() {
+    return selectedStartDate;
+  }
+
+  DateTime? getSelectedEndDate() {
+    return selectedEndDate;
+  }
+
+  bool isAskidaSelected() {
+    return _isSuspended;
+  }
 }
+List<String> getSelectedGenres(_FilterWidgetState state) {
+  return state.getSelectedGenres();
+}
+
+String? getSelectedCity(_FilterWidgetState state) {
+  return state.getSelectedCity();
+}
+
+DateTime? getSelectedStartDate(_FilterWidgetState state) {
+  return state.getSelectedStartDate();
+}
+
+DateTime? getSelectedEndDate(_FilterWidgetState state) {
+  return state.getSelectedEndDate();
+}
+
+bool isAskidaSelected(_FilterWidgetState state) {
+  return state.isAskidaSelected();
+}
+
