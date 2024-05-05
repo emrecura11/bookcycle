@@ -5,6 +5,8 @@ import 'package:bookcycle/pages/home_page.dart';
 import 'package:bookcycle/pages/profile_page.dart';
 import 'package:bookcycle/pages/addingBook_page.dart';
 
+import '../service/get_user_by_id.dart';
+
 class BottomNavBar extends StatefulWidget {
   @override
   _BottomNavBarState createState() => _BottomNavBarState();
@@ -12,7 +14,7 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomNavBarState extends State<BottomNavBar> {
   int _selectedIndex = 0;
-
+  String? currentUserId;
 
 
 
@@ -24,6 +26,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   _loadIndex() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    currentUserId = prefs.getString('userId');
     setState(() {
       _selectedIndex = (prefs.getInt('selectedIndex') ?? 0);
     });
@@ -35,6 +38,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
   }
 
   void _onItemTapped(int index) {
+    final List<Widget> _pages = [
+      HomePage(),
+      HomePage(),
+      AddBookPage(),
+      FavoritesPage(),
+      ProfilePage(userFuture: getUserInfo(currentUserId!),),
+    ];
+
     setState(() {
       _selectedIndex = index;
     });
@@ -45,13 +56,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
     );
   }
 
-  final List<Widget> _pages = [
-    HomePage(),
-    HomePage(),
-    AddBookPage(),
-    FavoritesPage(),
-    ProfilePage(),
-  ];
 
   @override
   Widget build(BuildContext context) {

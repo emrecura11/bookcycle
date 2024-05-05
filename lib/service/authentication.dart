@@ -18,8 +18,14 @@ Future<bool> authenticateUserWithApi(String email, String password) async {
 
   if (response.statusCode == 200) {
     String token = json.decode(response.body)['data']['jwToken'];
+    String userName = json.decode(response.body)['data']['userName'];
+    String userId = json.decode(response.body)['data']['id'];
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('jwtoken', token);
+    prefs.setString('userName', userName);
+    prefs.setString('userId', userId);
+
     return true;
   } else {
     // Kullanıcı doğrulanamadı

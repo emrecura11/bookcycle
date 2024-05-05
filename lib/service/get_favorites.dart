@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<List<int>> getFavorites(String email, List<int> idList) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? token = prefs.getString('token');
+  String? token = prefs.getString('jwtoken');
 
   final apiUrl = Uri.parse('https://localhost:9001/api/v1/Favorites/$email');
 

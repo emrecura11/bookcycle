@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/Book.dart';
+import '../models/User.dart';
 import '../service/get_favorites.dart';
 import '../service/get_book_by_id.dart';
+import '../service/get_user_by_id.dart';
+import 'bookDetails_page.dart';
 
 class FavoritesPage extends StatefulWidget {
   @override
@@ -16,25 +19,25 @@ class _FavoritesPageState extends State<FavoritesPage> {
   final List<Book> books = [];
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _loadFavorites();
   }
+
 
   Future<void> _loadFavorites() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('email');
 
+    print(email);
     try {
       List<int> favoriteBookIds = await getFavorites(email!,bookIds);
       for (int bookId in favoriteBookIds) {
         Book? book = await getBookById(bookId);
-        if (book != null) {
-          setState(() {
-            books.add(book);
-          });
-        }
-      }
+        setState(() {
+          books.add(book);
+        });
+            }
     } catch (error) {
       print('Error fetching favorites: $error');
     }
@@ -89,73 +92,116 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       end: Alignment.bottomRight,
                       colors: gradientColors,
                     );
-                    return Card(
-                      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: gradient,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: IntrinsicHeight(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.all(8.0),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.horizontal(left: Radius.circular(8), right: Radius.circular(8)),
-                                    child: Image.asset(
-                                      "/images/yarının_adamı_1",
-                                      fit: BoxFit.cover,
-                                    ),
+                    return FutureBuilder<User>(
+                      future: getUserInfo(books[index].createdBy),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          User user = snapshot.data!;
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BookDetailsPage(
+                                    bookFuture: getBookById(books[index].id),
                                   ),
                                 ),
-                                flex: 1,
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              );
+                            },
+                            child: Card(
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: gradient,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: IntrinsicHeight(
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            books[index].name,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                      Expanded(
+                                        child: Container(
+                                          margin: EdgeInsets.all(8.0),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.horizontal(
+                                                left: Radius.circular(8),
+                                                right: Radius.circular(8)),
+                                            child: books[index].bookImage != null
+                                                ? Image.asset(
+                                              books[index].bookImage!,
+                                              fit: BoxFit.cover,
+                                            )
+                                                : Image.asset(
+                                              "images/book1.jpg",
+                                              fit: BoxFit.cover,
                                             ),
-                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          if (books[index].isAskida)
-                                            Icon(Icons.volunteer_activism, color: Color(0xFF76C893),)
-                                          else
-                                            Icon(Icons.volunteer_activism_outlined, color: Color(0xFF76C893),)
-                                        ],
+                                        ),
+                                        flex: 1,
                                       ),
-                                      Text("Yazar: ${books[index].author}"),
-                                      Text("Kategori: ${books[index].genre}"),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("Kullanıcı: ${books[index].createdBy}"),
-                                          Text("Tarih: ${books[index].created}"),
-                                        ],
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                            children: <Widget>[
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    books[index].name,
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                  if (books[index].isAskida)
+                                                    Icon(
+                                                      Icons.volunteer_activism,
+                                                      color: Color(0xFF76C893),
+                                                    )
+                                                  else
+                                                    Icon(
+                                                      Icons.volunteer_activism_outlined,
+                                                      color: Color(0xFF76C893),
+                                                    )
+                                                ],
+                                              ),
+                                              Text("Yazar: ${books[index].author}"),
+                                              Text("Kategori: ${books[index].genre}"),
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text("Kullanıcı: ${user.userName}"),
+                                                  Text("Tarih: ${books[index].created.substring(0,7)}"),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        flex: 3,
                                       ),
                                     ],
                                   ),
                                 ),
-                                flex: 3,
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
+                            ),
+                          );
+                        }
+                      },
                     );
                   },
                 ),

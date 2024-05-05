@@ -1,41 +1,85 @@
-import 'package:bookcycle/pages/bookDetails_page.dart';
+import 'dart:async';
+import 'dart:io';
+
+import 'package:bookcycle/service/get_all_books.dart';
+import 'package:bookcycle/service/get_book_by_id.dart';
+import 'package:bookcycle/service/get_user_by_id.dart';
 import 'package:bookcycle/widgets/basic_button.dart';
 import 'package:bookcycle/widgets/drawer_profile.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/Book.dart';
+import '../models/User.dart';
 import '../widgets/bottomnavbar.dart';
+import 'bookDetails_page.dart';
 
-void main() {
-  runApp(MyApp());
-}
+class ProfilePage extends StatefulWidget {
+  final Future<User> userFuture;
 
-class Book {
-  final String title;
-  final String author;
-  final String category;
-  final String date;
-  final String imagePath;
+  ProfilePage({required this.userFuture});
 
-  Book(this.title, this.author,this.category, this.date, this.imagePath);
-}
-
-class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ProfilePage(),
-    );
-  }
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class ProfilePage extends StatelessWidget {
+class _ProfilePageState extends State<ProfilePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final List<Book> books = [
-    Book("Book 1", "Emre Cura", "Biyography", "07/2023", 'images/yarının_adamı_1.jpg'),
-    Book("Book 2", "Dilara Aksoy", "Biyography", "07/2023", 'images/yarının_adamı_2.jpg'),
-    Book("Book 3", "Emre Cura", "Biyography", "07/2023", 'images/yarının_adamı_1.jpg'),
-    Book("Book 4", "Dilara Aksoy", "Biyography", "07/2023", 'images/yarının_adamı_2.jpg'),
+   User user = User(id: '', userName: '', email: '');
+  bool _userIsCurrent = false;
+
+  final List<Book> books = [];
+
+  @override
+  void initState() {
+    super.initState();
+    initializeData();
+  }
+
+  void initializeData() {
+    getInfo().then((userIsLoggedIn) {
+      setState(() {
+        _userIsCurrent = userIsLoggedIn ?? false;
+      });
+    });
+  }
+
+  Future<bool> getInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+    var books2 = await getAllBooks();
+    user = await widget.userFuture;
+
+    books2.forEach((element) {
+      if(element.createdBy == user.id){
+        books.add(element);
+      }
+    });
+
+    if (userId != null) {
+      if (userId == user.id) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return false; // Varsayılan olarak false döndür
+  }
+
+
+
+  final List<List<Color>> colorPairs = [
+    /*[Color(0xFFFFBA78), Colors.white],
+    [Color(0xFFFFCC84), Colors.white],
+    [Color(0xFFFFD991), Colors.white],
+    [Color(0xFFFFE69E), Colors.white],*/
+
+    [Color(0xFFee8959), Colors.white],
+    [Color(0xFFf4a261), Colors.white],
+    [Color(0xFFdda15e), Colors.white],
+    [Color(0xFFf26b21), Colors.white],
   ];
 
   @override
@@ -50,16 +94,21 @@ class ProfilePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 30),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                    icon: const Icon(Icons.menu, color: Colors.black),
-                    onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+              Visibility(
+                visible: _userIsCurrent,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 30),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.menu, color: Colors.black),
+                      onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                    ),
                   ),
                 ),
               ),
+
+
               const Padding(
                 padding: EdgeInsets.only(top: 20.0),
                 child: Align(
@@ -71,10 +120,10 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              const Align(
+               Align(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  "Dilara Aksoy",
+                  user.userName,
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.black,
@@ -85,13 +134,13 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children:  [
                   Icon(
                     Icons.location_on,
                     color: Color(0xFF88C4A8),
                   ),
                   Text(
-                    "Antalya",
+                    user.email,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black,
@@ -99,30 +148,25 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              const Text(
-                "My name is Emre. I love to read historical book.",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
-              ),
+
               const SizedBox(height: 10),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.messenger,
-                    color: Color(0xFF88C4A8),
-                  ),
-                  BasicButton(
-                      onTap:() {
-                  Navigator.push(context, MaterialPageRoute(builder:(context)=> ProfilePage()),);
-                  },
-                      buttonText: "Get Contact"
-                  ),
-                ],
+              Visibility(
+                visible: !_userIsCurrent,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.messenger,
+                      color: Color(0xFF88C4A8),
+                    ),
+                    BasicButton(
+                        onTap: () {
+
+                        },
+                        buttonText: "Get Contact"),
+                  ],
+                ),
               ),
               const SizedBox(height: 10),
 
@@ -148,74 +192,122 @@ class ProfilePage extends StatelessWidget {
               ),
 
               // ListView
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: books.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    margin: EdgeInsets.symmetric(horizontal: 10), // Sağdan ve soldan 5 dp uzaklık
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          width: double.infinity, // ListTile'ın genişliği
-                          height: 140, // ListTile'ın yüksekliği
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEFECDC), // Arka plan rengi
-                            borderRadius: BorderRadius.circular(8), // Köşe yarıçapı
-                          ),
-                          child: ListTile(
-                            leading: Image.asset(books[index].imagePath, width: 70, height: 100), // Resim boyutu
-                            title: Text(books[index].title,
-                             style:
-                             const TextStyle(
-                                 fontWeight: FontWeight.bold,
-                             ),
-                            ),
-                            subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              SizedBox(height: 8),
-                              Text(
-                                "Author: ${books[index].author}",
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                  "Category: ${books[index].category}"
-                              ),
-                              SizedBox(height: 15),
-                            Container(
-                              width: double.infinity,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const  Color(0xFFBA9999),
-                                      padding: const EdgeInsets.symmetric(horizontal: 10,),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10.0),
-                                        ),
-                                      ),
+              SizedBox(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: books.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final gradientColors = colorPairs[index % colorPairs.length];
+                    final Book book = books[index];
 
-                                    onPressed:  () {Navigator.push(context, MaterialPageRoute(builder:(context)=> BookDetailsPage()),);},
-                                    child: const Text('See more details'),
-                                  ),
-                                  Text("Date: ${books[index].date}"),
-                                ],
-                                ),
+                    final gradient = LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: gradientColors,
+                    );
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BookDetailsPage(
+                              bookFuture: getBookById(books[index].id),
                             ),
-                            ],
                           ),
-                            contentPadding: EdgeInsets.all(10), // İçerik boşluğu
+                        );
+                      },
+                      child: Card(
+                        margin: EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: gradient,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.all(8.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.horizontal(
+                                          left: Radius.circular(8),
+                                          right: Radius.circular(8)),
+                                      child: books[index].bookImage != null
+                                          ? Image.asset(
+                                        books[index].bookImage!,
+                                        fit: BoxFit.cover,
+                                      )
+                                          : Image.asset(
+                                        "images/book1.jpg",
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  flex: 1,
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                      children: <Widget>[
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              books[index].name,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            if (books[index].isAskida)
+                                              Icon(
+                                                Icons.volunteer_activism,
+                                                color: Color(0xFF76C893),
+                                              )
+                                            else
+                                              Icon(
+                                                Icons.volunteer_activism_outlined,
+                                                color: Color(0xFF76C893),
+                                              )
+                                          ],
+                                        ),
+                                        Text("Yazar: ${books[index].author}"),
+                                        Text("Kategori: ${books[index].genre}"),
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Kullanıcı: ${user.userName}"),
+                                            Text("Tarih: ${books[index].created.substring(0,7)}"),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  flex: 3,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        SizedBox(height: 10), // Elemanlar arasında 10 dp boşluk
-                      ],
-                    ),
-                  );
-                },
-              )
+                      ),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),
