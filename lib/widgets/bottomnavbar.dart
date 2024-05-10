@@ -9,15 +9,16 @@ import 'package:bookcycle/pages/addingBook_page.dart';
 import '../service/get_user_by_id.dart';
 
 class BottomNavBar extends StatefulWidget {
+  final int selectedIndex;
+
+  BottomNavBar({required this.selectedIndex});
+
   @override
   _BottomNavBarState createState() => _BottomNavBarState();
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  int _selectedIndex = 0;
-  String? currentUserId;
-
-
+  late String? currentUserId;
 
   @override
   void initState() {
@@ -25,70 +26,66 @@ class _BottomNavBarState extends State<BottomNavBar> {
     _loadIndex();
   }
 
-  _loadIndex() async {
+  Future<void> _loadIndex() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currentUserId = prefs.getString('userId');
-    setState(() {
-      _selectedIndex = (prefs.getInt('selectedIndex') ?? 0);
-    });
   }
-
-  _saveIndex(int index) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('selectedIndex', index);
-  }
-
-  void _onItemTapped(int index) {
-    final List<Widget> _pages = [
-      HomePage(),
-      ConversationListPage(userId: currentUserId!),
-      AddBookPage(),
-      FavoritesPage(),
-      ProfilePage(userFuture: getUserInfo(currentUserId!),),
-    ];
-
-    setState(() {
-      _selectedIndex = index;
-    });
-    _saveIndex(index);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => _pages[index]),
-    );
-  }
-
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Colors.black, width: 1),
-        ),
-      ),
-      child: BottomAppBar(
-        color: Colors.white,
-        child: Container(
-          height: kToolbarHeight + 5,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              _buildIcon(Icons.home_outlined, Icons.home, 0),
-              _buildIcon(Icons.messenger_outline, Icons.messenger, 1),
-              _buildIcon(Icons.add_circle_outline, Icons.add_circle, 2, size: 30),
-              _buildIcon(Icons.favorite_border_outlined, Icons.favorite, 3),
-              _buildIcon(Icons.person_2_outlined, Icons.person_2, 4),
-            ],
-          ),
+    return BottomAppBar(
+      color: Colors.white,
+      child: Container(
+        height: kToolbarHeight + 5,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            _buildIcon(Icons.home_outlined, Icons.home, 0, context),
+            _buildIcon(Icons.messenger_outline, Icons.messenger, 1, context),
+            _buildIcon(Icons.add_circle_outline, Icons.add_circle, 2, context, size: 30),
+            _buildIcon(Icons.favorite_border_outlined, Icons.favorite, 3, context),
+            _buildIcon(Icons.person_2_outlined, Icons.person_2, 4, context),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildIcon(IconData outlineIcon, IconData solidIcon, int index, {double size = 24.0}) {
+  Widget _buildIcon(IconData outlineIcon, IconData solidIcon, int index, BuildContext context, {double size = 24.0}) {
     return IconButton(
-      onPressed: () => _onItemTapped(index),
-      icon: Icon(_selectedIndex == index ? solidIcon : outlineIcon, size: size),
+      onPressed: () {
+        if (widget.selectedIndex != index) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) {
+              switch (index) {
+                case 0:
+                  return HomePage();
+                case 1:
+                  return ConversationListPage();
+                case 2:
+                  return AddBookPage();
+                case 3:
+                  return FavoritesPage();
+                case 4:
+                  return FutureBuilder<void>(
+                    future: _loadIndex(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return ProfilePage(userFuture: getUserInfo(currentUserId!));
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    },
+                  );
+                default:
+                  return HomePage();
+              }
+            }),
+          );
+        }
+      },
+      icon: Icon(widget.selectedIndex == index ? solidIcon : outlineIcon, size: size),
     );
   }
 }

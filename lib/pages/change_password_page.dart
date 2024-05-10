@@ -78,8 +78,6 @@ class ChangePassword extends StatelessWidget{
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
-
     );
 
   }

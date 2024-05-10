@@ -84,7 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: ProfileDrawer(),
+      drawer: ProfileDrawer(userId: userId,),
       backgroundColor: Colors.white,
       floatingActionButton: _userIsCurrent && _isShowingWishlist
           ? FloatingActionButton(
@@ -236,7 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: BottomNavBar(selectedIndex: 4,),
     );
   }
 
