@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bookcycle/service/get_all_books.dart';
@@ -109,13 +110,17 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
 
-              const Padding(
+               Padding(
                 padding: EdgeInsets.only(top: 20.0),
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: CircleAvatar(
                     radius: 70,
-                    backgroundImage: AssetImage('images/logo_bookcycle.jpeg'),
+                    backgroundImage:user.userImage != null
+                        ? (user.userImage!.startsWith('http')
+                        ? NetworkImage(user.userImage!) // URL olarak kullan
+                        : MemoryImage(base64Decode(user.userImage!)) as ImageProvider<Object>) // Base64 string
+                        : const AssetImage('images/logo_bookcycle.jpeg'),
                   ),
                 ),
               ),
