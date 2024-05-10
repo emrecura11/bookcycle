@@ -1,13 +1,17 @@
 import 'package:bookcycle/pages/login_page.dart';
+import 'package:bookcycle/service/register.dart';
 import 'package:flutter/material.dart';
 import '../widgets/basic_textfield.dart';
 import 'package:animate_do/animate_do.dart';
 class SignupPage extends StatelessWidget{
   SignupPage({super.key});
-  final emailController=TextEditingController();
-  final passwordController=TextEditingController();
-  final usernameController=TextEditingController();
-  final passwordAgainController=TextEditingController();
+
+
+  TextEditingController usernameController=TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController passwordAgainController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     double height=MediaQuery.of(context).size.height;
@@ -147,12 +151,9 @@ class SignupPage extends StatelessWidget{
                         FadeInUp(duration: Duration(milliseconds: 1600),
                             child: MaterialButton(
                               onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>LoginPage(),
-                                  ),
-                                );
+                                signUpUser(context, usernameController.text, emailController.text,
+                                    passwordController.text, passwordAgainController.text);
+
                               },
                               height: 50,
                               // margin: EdgeInsets.symmetric(horizontal: 50),

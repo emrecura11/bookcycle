@@ -1,3 +1,4 @@
+import 'package:bookcycle/pages/fileter_results_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/Book.dart';
@@ -44,99 +45,48 @@ class _HomePageState extends State<HomePage> {
     [Colors.white, Colors.white],
   ];
 
-  void _applyFilters(String genre, bool? isAskida, String startDate, String endDate) async {
-    try {
-      final List<Book> filteredBooks = await getFilteredBooks(genre, isAskida, startDate, endDate);
-      setState(() {
-        _filteredBooks = filteredBooks;
-      });
-      Navigator.of(context).pop(); // Close the bottom sheet after applying filters
-    } catch (e) {
-      // Handle error
-      print('Error applying filters: $e');
-    }
-  }
 
   void _showFilterDialog(BuildContext context) {
-    double height=MediaQuery.of(context).size.height*0.04;
-    FilterWidget filterWidget = FilterWidget();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-
-        return Container(
-          decoration: BoxDecoration(
-            color: Color(0xFFFDFDFD),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
-            ),
-          ),
-          padding: EdgeInsets.all(16.0),
-          height:  MediaQuery.of(context).size.height*0.8 ,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min, // İçerik boyutuna göre boyutlandır
-              children: <Widget>[
-                Text(
-                  'Filtreleme',
-                  style: TextStyle(
-                    fontSize: 26.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Color(0xFFFDFDFD),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15),
+                  topRight: Radius.circular(15),
                 ),
-                SingleChildScrollView(
-                  child: filterWidget,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              ),
+              padding: EdgeInsets.all(16.0),
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.deepOrange.shade300,
-                        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                    Text(
+                      'Filtreleme',
+                      style: TextStyle(
+                        fontSize: 26.0,
+                        fontWeight: FontWeight.bold,
                       ),
-                      child: Text(
-                        'İptal',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
                     ),
-                    SizedBox(width: height),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.deepOrange.shade300,
-                        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                      ),
-                      child: Text(
-                        'Uygula',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onPressed: () {
-
-                      },
-                    ),
+                    FilterWidget(),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
+
 
 
   void _filterBooks(String query) {
@@ -198,7 +148,9 @@ class _HomePageState extends State<HomePage> {
                           Icons.filter_list,
                           color: Colors.black,
                         ),
-                        onPressed: () => _showFilterDialog(context),
+                        onPressed: () {
+                         _showFilterDialog(context);
+                        }
                       ),
                     ],
                   ),
@@ -206,6 +158,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
+          headerTopCategories(),
           SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.only(left: 16, bottom: 8),
@@ -356,4 +309,65 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavBar(),
     );
   }
+}
+
+Widget sectionHeader(String headerTitle, {onViewMore}) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      Container(
+        margin: EdgeInsets.only(left: 15, top: 10),
+        child: Text(headerTitle,),
+      ),
+    ],
+  );
+}
+
+Widget headerTopCategories() {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: <Widget>[
+      sectionHeader('Tüm Kategoriler', onViewMore: () {}),
+      SizedBox(
+        height: 100,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          children: <Widget>[
+            headerCategoryItem('Frieds', Icons.image_search_rounded, onPressed: () {}),
+            headerCategoryItem('Fast Food',Icons.image_search_rounded, onPressed: () {}),
+            headerCategoryItem('Creamery', Icons.image_search_rounded, onPressed: () {}),
+            headerCategoryItem('Hot Drinks', Icons.image_search_rounded, onPressed: () {}),
+            headerCategoryItem('Vegetables',Icons.image_search_rounded, onPressed: () {}),
+          ],
+        ),
+      )
+    ],
+  );
+}
+
+Widget headerCategoryItem(String name, IconData icon, {onPressed}) {
+  return Container(
+    margin: EdgeInsets.only(left: 15),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Container(
+            margin: EdgeInsets.only(bottom: 10),
+            width: 70,
+            height: 70,
+            child: FloatingActionButton(
+              shape: CircleBorder(),
+              heroTag: name,
+              onPressed: onPressed,
+              backgroundColor: Colors.white,
+              child: Icon(icon, size: 35, color: Colors.black87),
+            )),
+        Text(name + ' ›',)
+      ],
+    ),
+  );
 }

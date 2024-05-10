@@ -1,3 +1,4 @@
+import 'package:bookcycle/service/delete_favorites.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/Book.dart';
@@ -17,7 +18,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   final List<int> bookIds = [];
   final List<Book> books = [];
-
+  User currentUser = User(id: "", email: "", userName: "");
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -27,15 +28,18 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   Future<void> _loadFavorites() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? email = prefs.getString('email');
+    String? userId = prefs.getString('userId');
 
-    print(email);
+    currentUser = await getUserInfo(userId!);
+
+    print(userId);
     try {
-      List<int> favoriteBookIds = await getFavorites(email!,bookIds);
+      List<int> favoriteBookIds = await getFavorites(userId!,bookIds);
       for (int bookId in favoriteBookIds) {
         Book? book = await getBookById(bookId);
         setState(() {
           books.add(book);
+          print(book.name);
         });
             }
     } catch (error) {
@@ -167,16 +171,30 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                                     ),
                                                     overflow: TextOverflow.ellipsis,
                                                   ),
-                                                  if (books[index].isAskida)
-                                                    Icon(
-                                                      Icons.volunteer_activism,
-                                                      color: Color(0xFF76C893),
-                                                    )
-                                                  else
-                                                    Icon(
-                                                      Icons.volunteer_activism_outlined,
-                                                      color: Color(0xFF76C893),
-                                                    )
+                                                  Row(
+                                                    children: [
+                                                      if (books[index].isAskida)
+                                                        Icon(
+                                                          Icons.volunteer_activism,
+                                                          color: Color(0xFF76C893),
+                                                        )
+                                                      else
+                                                        Icon(
+                                                          Icons.volunteer_activism_outlined,
+                                                          color: Color(0xFF76C893),
+                                                        ),
+                                                      IconButton(
+                                                        onPressed: () {
+                                                          deleteFavorite(currentUser.id,books[index].id).then((_) {
+                                                            setState(() {
+                                                              books.removeAt(index);
+                                                            });
+                                                          });                                                          },
+                                                        icon: Icon(Icons.delete),
+                                                        color: Colors.black,
+                                                      ),
+                                                    ],
+                                                  )
                                                 ],
                                               ),
                                               Text("Yazar: ${books[index].author}"),

@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<List<int>> getFavorites(String email, List<int> idList) async {
+Future<List<int>> getFavorites(String userId, List<int> idList) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('jwtoken');
 
-  final apiUrl = Uri.parse('https://localhost:9001/api/v1/Favorites/$email');
+  final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Favorites?userId=$userId');
 
   try {
     http.Response response = await http.get(

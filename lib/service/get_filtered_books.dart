@@ -1,28 +1,39 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/Book.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../models/Book.dart';
 
-Future<List<Book>> getFilteredBooks(String genre, bool? isAskida, String startDate, String endDate) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? token = prefs.getString('jwtoken');
+Future<List<Book>> getFilteredBooks(List<String> genres, bool? isAskida, String? startDate, String? endDate) async {
+  final queryParams = {
+    'genres': genres.isNotEmpty ? genres.join(',') : null,
+    'isAskida': isAskida?.toString() ?? 'false',
+    'startDate': startDate,
+    'endDate': endDate,
+  };
 
-  final apiUrl = Uri.parse('https://localhost:9001/api/v1/Book/filter?genre=$genre&isAskida=$isAskida&startDate=$startDate&endDate=$endDate');
+  final filteredParams = queryParams..removeWhere((key, value) => value == null);
+
+  // Build URI with the encoded query parameters
+  final uri = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Book/filter').replace(queryParameters: filteredParams);
 
   try {
-    final response = await http.get(
-      apiUrl,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
+    // Log the final URI with all parameters
+    print('API request URL: $uri');
+
+    final response = await http.get(uri, headers: {'accept': '*/*'});
+
+    // Log the response status and body for debugging
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
-      final List<dynamic> responseData = json.decode(response.body);
-      return responseData.map((data) => Book.fromJson(data)).toList();
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+
+      // Adjust to the correct field name containing the data
+      final List<dynamic> booksData = jsonResponse['data'];
+
+      return booksData.map((data) => Book.fromJson(data)).toList();
     } else {
-      throw Exception('Failed to load filtered books');
+      throw Exception('Failed to load filtered books. Status code: ${response.statusCode}.');
     }
   } catch (e) {
     throw Exception('Failed to load filtered books: $e');

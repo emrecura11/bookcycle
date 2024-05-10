@@ -16,14 +16,21 @@ class _AddBookPageState extends State<AddBookPage> {
   String _bookName = '';
   String _author = '';
   String _advertisementDescription = '';
-  String _genre = 'History'; // default value
-  String _bookState = 'New'; // default value
+  String _genre = 'Şiir'; // default value
+  String _bookState = 'Yeni'; // default value
   File? galleryFile;
   final picker = ImagePicker();
   bool _isSuspended = false;
 
-  final List<String> _genres = ['History', 'Fictional', 'Horror', 'Biography'];
-  final List<String> _bookStates = ['New', 'Old', 'Worn'];
+  final List<String> _genres = [  'Şiir',
+    'Gerilim',
+    'Tarih-Coğrafya',
+    'Kişisel Gelişim',
+    'Siyaset',
+    'Eğitim',
+    'Çocuk',
+    'Felsefi',];
+  final List<String> _bookStates = ['Yeni', 'Eski', 'Yıpranmış'];
 
   void _showPicker({required BuildContext context}) {
     showModalBottomSheet(
@@ -79,7 +86,7 @@ class _AddBookPageState extends State<AddBookPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('jwtoken');
 
-    final apiUrl = Uri.parse('https://localhost:9001/api/v1/Book');
+    final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Book');
 
     try {
       final response = await http.post(

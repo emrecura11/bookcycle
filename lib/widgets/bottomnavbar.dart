@@ -1,3 +1,4 @@
+import 'package:bookcycle/pages/chatPartnersPage.dart';
 import 'package:bookcycle/pages/favorites_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,7 +41,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   void _onItemTapped(int index) {
     final List<Widget> _pages = [
       HomePage(),
-      HomePage(),
+      ConversationListPage(userId: currentUserId!),
       AddBookPage(),
       FavoritesPage(),
       ProfilePage(userFuture: getUserInfo(currentUserId!),),
