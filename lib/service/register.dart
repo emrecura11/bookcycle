@@ -7,7 +7,7 @@ import 'dart:convert';
 Future<void> signUpUser(BuildContext context,String username,String email,
     String password,String confirmPassword ) async {
 
-  final apiUrl = Uri.parse('https://localhost:9001/api/Account/register');
+  final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/Account/register');
 
   Map<String, dynamic> requestBody = {
     'email': email,

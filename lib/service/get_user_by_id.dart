@@ -4,7 +4,7 @@ import 'dart:convert';
 import '../models/User.dart';
 
 Future<User> getUserInfo(String userId) async {
-  final apiUrl = Uri.parse('https://localhost:9001/api/Account/user/$userId');
+  final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/Account/user/$userId');
 
 
   try {

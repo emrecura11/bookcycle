@@ -79,7 +79,7 @@ class _AddBookPageState extends State<AddBookPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('jwtoken');
 
-    final apiUrl = Uri.parse('https://localhost:9001/api/v1/Book');
+    final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Book');
 
     try {
       final response = await http.post(

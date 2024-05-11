@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'dart:html' as html; // Web platformu için gerekli
 import 'dart:typed_data';
 import 'package:bookcycle/pages/profile_page.dart';
-import 'package:flutter/foundation.dart'; // kIsWeb kontrolü için
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -28,9 +26,9 @@ class _EditProfileState extends State<EditProfile> {
   Uint8List? webImageBytes;
   final picker = ImagePicker();
   bool _isUploading = false;
-  User user = User(id: '', userName: '', email: '');
+  User user = User(id: '', userName: '', email: '',userImage: '',);
 
-  final String baseUrl = 'https://localhost:9001/api/Account';
+  final String baseUrl = 'https://bookcycle.azurewebsites.net/api/Account';
 
   @override
   void initState() {
@@ -86,9 +84,6 @@ class _EditProfileState extends State<EditProfile> {
     if (galleryFile != null) {
       // Yerel dosya olarak seçilen fotoğrafı göster
       return FileImage(galleryFile!);
-    } else if (kIsWeb && webImageBytes != null) {
-      // Web platformunda seçilen Base64 verisini göster
-      return MemoryImage(webImageBytes!);
     } else if (user.userImage != null) {
       // Kullanıcı profil fotoğrafı varsa onu göster
       return user.userImage!.startsWith('http')
@@ -143,40 +138,14 @@ class _EditProfileState extends State<EditProfile> {
     return result; // Yeni sıkıştırılmış dosya
   }
   Future<void> _pickImage(ImageSource img) async {
-    if (kIsWeb) {
-      // Web platformu için Base64'e çevir
-      final html.InputElement input = html.InputElement(type: 'file');
-      input.accept = 'image/*';
-      input.click();
-
-      input.onChange.listen((event) {
-        final files = input.files;
-        if (files != null && files.isNotEmpty) {
-          final html.File file = files.first;
-
-          final reader = html.FileReader();
-          reader.readAsArrayBuffer(file);
-
-          reader.onLoadEnd.listen((event) {
-            webImageBytes = Uint8List.fromList(reader.result as List<int>);
-            setState(() {
-              base64Image = base64Encode(webImageBytes!);
-              galleryFile = null;// Web platformunda `File` kullanılmaz
-            });
-          });
-        }
-      });
-    } else {
       // Diğer platformlar için
       final pickedFile = await picker.pickImage(source: img);
       if (pickedFile != null) {
-        // Kırpma işlemi
-        final croppedFile = await _cropImage(File(pickedFile.path));
+
 
         // Sıkıştırma işlemi
-        final compressedFile = croppedFile != null
-            ? await compressImage(croppedFile)
-            : await compressImage(File(pickedFile.path));
+        final compressedFile =
+            await compressImage(File(pickedFile.path));
 
         setState(() {
           galleryFile = compressedFile ?? File(pickedFile.path);
@@ -186,7 +155,6 @@ class _EditProfileState extends State<EditProfile> {
           const SnackBar(content: Text('No image selected')),
         );
       }
-    }
   }
 
   Future<void> _saveProfile() async {
@@ -203,23 +171,8 @@ class _EditProfileState extends State<EditProfile> {
 
     final uploadService = UploadImageService(baseUrl: baseUrl);
 
-    if (kIsWeb&& webImageBytes != null) {
-      // Web platformunda Base64 verisini gönder
-      bool success = await uploadService.uploadImageAsBase64String(user.id, webImageBytes!);
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => ProfilePage(userFuture: getUserInfo(user.id!))), // Burada doğru userFuture'ı sağlayın
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update profile.')),
-        );
-      }
-    } else if (galleryFile != null)  {
+    if (galleryFile != null)  {
+
       // Diğer platformlarda `File` kullanarak gönder
       bool success = await uploadService.uploadImageAsBase64File(user.id, galleryFile!);
       if (success) {

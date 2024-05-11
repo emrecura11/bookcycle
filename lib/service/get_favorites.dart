@@ -6,7 +6,7 @@ Future<List<int>> getFavorites(String email, List<int> idList) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('jwtoken');
 
-  final apiUrl = Uri.parse('https://localhost:9001/api/v1/Favorites/$email');
+  final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Favorites/$email');
 
   try {
     http.Response response = await http.get(
