@@ -143,12 +143,9 @@ class _EditProfileState extends State<EditProfile> {
       if (pickedFile != null) {
 
 
-        // Sıkıştırma işlemi
-        final compressedFile =
-            await compressImage(File(pickedFile.path));
 
         setState(() {
-          galleryFile = compressedFile ?? File(pickedFile.path);
+          galleryFile = File(pickedFile.path);
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

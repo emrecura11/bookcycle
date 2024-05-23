@@ -17,15 +17,15 @@ class UploadImageService {
     final bytes = await imageFile.readAsBytes();
 
     // Resmi küçültme işlemi (örnek olarak 300x300'e)
-    img.Image? originalImage = img.decodeImage(Uint8List.fromList(bytes));
-    img.Image resizedImage = img.copyResize(originalImage!, width: 200, height: 200);
+    img.Image? originalImage = img.decodeImage(bytes);
+    img.Image resizedImage = img.copyResize(originalImage!, width: 300, height: 300);
 
     // Byte array'i Base64 formatına dönüştür
     final String base64Image = base64Encode(img.encodeJpg(resizedImage, quality: 60)); // Kalite ayarı
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('jwtoken');
-    User user = User(id: '', userName: '', email: '',userImage: '',);
+    User user = User(id: '', userName: '', email: '',userImage: '',location: '',description: '');
     user = await getUserInfo(userId!);
     user.userImage = base64Image; // Sadece userImage güncellenir
 
@@ -34,21 +34,22 @@ class UploadImageService {
       'id': user.id,
       'email': user.email,
       'userName': user.userName,
-      'location': user.location,
+      'location': '',
+      'description': '',
       'userImage': user.userImage, // Güncel resmi gönderin
-      'description': user.description,
     });
 
     // JSON formatında bir HTTP POST isteği yap
     final response = await http.put(
-      Uri.parse('$baseUrl/update-user/$userId'),
+      Uri.parse('$baseUrl/update-user?userId=$userId'),
       headers: {'Authorization': 'Bearer $token','Content-Type': 'application/json'},
       body: jsonBody,
     );
     // Başarılı olup olmadığını kontrol et
-    if (response.statusCode == 204) {
+    if (response.statusCode == 200) {
       return true;
     } else {
+      print(response.request);
       return false;
     }
   }
