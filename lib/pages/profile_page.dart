@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bookcycle/service/get_all_books.dart';
@@ -88,12 +89,20 @@ class _ProfilePageState extends State<ProfilePage> {
       key: _scaffoldKey,
       drawer: ProfileDrawer(),
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+    body: FutureBuilder<User>(
+    future: widget.userFuture,
+    builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.done) {
+    if (snapshot.hasError) {
+    return Center(child: Text("Error: ${snapshot.error}"));
+    } else if (snapshot.hasData) {
+    User user = snapshot.data!;
+    return SingleChildScrollView(
+    child: Center(
+    child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
               Visibility(
                 visible: _userIsCurrent,
                 child: Padding(
@@ -109,16 +118,21 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
 
-              const Padding(
+               Padding(
                 padding: EdgeInsets.only(top: 20.0),
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: CircleAvatar(
                     radius: 70,
-                    backgroundImage: AssetImage('images/logo_bookcycle.jpeg'),
+                    backgroundImage:user.userImage != null
+                        ? (user.userImage!.startsWith('http')
+                        ? NetworkImage(user.userImage!) // URL olarak kullan
+                        : MemoryImage(base64Decode(user.userImage!)) as ImageProvider<Object>) // Base64 string
+                        : const AssetImage('images/logo_bookcycle.jpeg'),
                   ),
                 ),
               ),
+
               const SizedBox(height: 16),
                Align(
                 alignment: Alignment.topCenter,
@@ -132,6 +146,19 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.topCenter,
+                child: Text(
+                  user.description ?? '', // Displaying description
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children:  [
@@ -140,7 +167,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Color(0xFF88C4A8),
                   ),
                   Text(
-                    user.email,
+                    user.location??'Bilinmiyor',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black,
@@ -237,12 +264,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                     margin: EdgeInsets.all(8.0),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.horizontal(
-                                          left: Radius.circular(8),
-                                          right: Radius.circular(8)),
-                                      child: books[index].bookImage != null
-                                          ? Image.asset(
-                                        books[index].bookImage!,
+                                        left: Radius.circular(8),
+                                        right: Radius.circular(8),
+                                      ),
+                                      child: book.bookImage != null &&
+                                          book.bookImage!.isNotEmpty
+                                          ? Image.memory(
+                                        base64Decode(base64.normalize(
+                                            book.bookImage!)),
                                         fit: BoxFit.cover,
+                                        errorBuilder: (context, error,
+                                            stackTrace) {
+                                          return Image.asset(
+                                              "images/book1.jpg",
+                                              fit: BoxFit.cover);
+                                        },
                                       )
                                           : Image.asset(
                                         "images/book1.jpg",
@@ -308,10 +344,15 @@ class _ProfilePageState extends State<ProfilePage> {
                   },
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+    ],
+    ),
+    ),
+    );
+    }
+    }
+    return Center(child: CircularProgressIndicator());
+    },
+    ),
       bottomNavigationBar: BottomNavBar(),
     );
   }

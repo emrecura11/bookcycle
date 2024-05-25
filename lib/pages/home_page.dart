@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/Book.dart';
@@ -274,17 +276,26 @@ class _HomePageState extends State<HomePage> {
                                       margin: EdgeInsets.all(8.0),
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.horizontal(
-                                            left: Radius.circular(8),
-                                            right: Radius.circular(8)),
-                                        child: book.bookImage != null
-                                            ? Image.asset(
-                                                book.bookImage!,
-                                                fit: BoxFit.cover,
-                                              )
-                                            : Image.asset(
+                                          left: Radius.circular(8),
+                                          right: Radius.circular(8),
+                                        ),
+                                        child: book.bookImage != null &&
+                                            book.bookImage!.isNotEmpty
+                                            ? Image.memory(
+                                          base64Decode(base64.normalize(
+                                              book.bookImage!)),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error,
+                                              stackTrace) {
+                                            return Image.asset(
                                                 "images/book1.jpg",
-                                                fit: BoxFit.cover,
-                                              ),
+                                                fit: BoxFit.cover);
+                                          },
+                                        )
+                                            : Image.asset(
+                                          "images/book1.jpg",
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
                                     flex: 1,

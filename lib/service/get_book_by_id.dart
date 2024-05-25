@@ -5,7 +5,7 @@ import 'dart:convert';
 import '../models/Book.dart';
 
   Future<Book> getBookById(int id) async {
-  final apiUrl = Uri.parse('https://localhost:9001/api/v1/Book/$id');
+  final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Book/$id');
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('jwtoken');
 

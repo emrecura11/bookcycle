@@ -1,9 +1,13 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:bookcycle/pages/change_location_page.dart';
 import 'package:bookcycle/pages/change_password_page.dart';
 import 'package:bookcycle/pages/edit_profile_page.dart';
 import 'package:bookcycle/pages/my_advertisements.dart';
-import 'package:bookcycle/widgets/drawer_security.dart';
-import 'package:flutter/material.dart';
+import 'package:bookcycle/models/User.dart';
+import 'package:bookcycle/service/get_user_by_id.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class ProfileDrawer extends StatefulWidget {
@@ -12,69 +16,89 @@ class ProfileDrawer extends StatefulWidget {
 }
 
 class _ProfileDrawerState extends State<ProfileDrawer> {
+  Future<User>? userFuture;
+
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  void _loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+    if (userId != null) {
+      setState(() {
+        userFuture = getUserInfo(userId);
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         children: <Widget>[
-          const SizedBox(
-            height: 20,
+          const SizedBox(height: 20),
+          FutureBuilder<User>(
+            future: userFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text("Error: ${snapshot.error}");
+              } else if (snapshot.hasData) {
+                User user = snapshot.data!;
+                return Row(
+                  children: <Widget>[
+                    const SizedBox(width: 20),
+                    CircleAvatar(
+                      backgroundImage: user.userImage != null && user.userImage!.isNotEmpty
+                          ? (user.userImage!.startsWith('http')
+                          ? NetworkImage(user.userImage!)
+                          : MemoryImage(base64Decode(user.userImage!)) as ImageProvider<Object>)
+                          : const AssetImage('images/logo_bookcycle.jpeg'),
+                      radius: 50,
+                    ),
+                    const SizedBox(width: 20),
+                    Text(
+                      user.userName,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return Text("No user data available");
+            },
           ),
-
-          Row(
-
-             children: const <Widget>[
-               SizedBox(
-                 width: 20,
-               ),
-               CircleAvatar(
-               backgroundImage: AssetImage('images/logo_bookcycle.jpeg'),
-                 radius: 50,
-               ),
-               SizedBox(
-                 width: 20,
-               ),
-                Text(
-                "Dilara Aksoy",
-                 style: TextStyle(color: Colors.black,
-                 fontSize: 18,
-                 ),
-             ),
-             ],
-          ),
-          const SizedBox(
-            height: 20,
-          ),
+          const SizedBox(height: 20),
           const Divider(
             color: Colors.black,
             height: 1,
             thickness: 0.5,
           ),
-          const SizedBox(
-            height: 20,
-          ),
-
+          const SizedBox(height: 20),
           buildDrawerItem(
             icon: Icons.person,
-            text: "Edit Profile",
+            text: "Profili Düzenle",
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => EditProfile()),
               );
-            }
+            },
           ),
           buildDrawerItem(
             icon: Icons.security_rounded,
-            text: "Security",
+            text: "Güvenlik",
             onTap: () => _showEditProfileBottomSheet(context),
           ),
-
-
           buildDrawerItem(
             icon: Icons.book,
-            text: "My Advertisement",
+            text: "İlanlarım",
             onTap: () {
               Navigator.push(
                 context,
@@ -84,7 +108,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
           ),
           buildDrawerItem(
             icon: Icons.logout,
-            text: "Logout",
+            text: "Çıkış yap",
             onTap: () {
               // Handle Logout tap
             },
@@ -93,6 +117,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
       ),
     );
   }
+
 
   Widget buildDrawerItem({required IconData icon, required String text, required void Function() onTap}) {
     return Padding(
@@ -133,7 +158,7 @@ void _showEditProfileBottomSheet(BuildContext context) {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.0),
               child: Text(
-                'Security',
+                'Güvenlik',
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -143,27 +168,14 @@ void _showEditProfileBottomSheet(BuildContext context) {
 
             const Divider(thickness: 2,),
 
-            ListTile(
-              leading:  Icon(
-                  Icons.location_on,
-                  color: Colors.deepOrange.shade300),
-              title: Text('Change Location'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  ChangeLocation()),
-                );
-              },
-            ),
-            const Divider(thickness: 1,),
+
 
             ListTile(
               leading:  Icon(
                   Icons.lock,
                   color: Colors.deepOrange.shade300
               ),
-              title: Text('Change Password'),
+              title: Text('Şifre Değiştirme'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(

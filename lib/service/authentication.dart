@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 
 Future<bool> authenticateUserWithApi(String email, String password) async {
-  final url = Uri.parse('https://localhost:9001/api/Account/authenticate');
+  final url = Uri.parse('https://bookcycle.azurewebsites.net/api/Account/authenticate');
 
   final response = await http.post(
     url,

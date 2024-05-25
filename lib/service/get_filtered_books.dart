@@ -7,7 +7,7 @@ Future<List<Book>> getFilteredBooks(String genre, bool? isAskida, String startDa
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('jwtoken');
 
-  final apiUrl = Uri.parse('https://localhost:9001/api/v1/Book/filter?genre=$genre&isAskida=$isAskida&startDate=$startDate&endDate=$endDate');
+  final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Book/filter?genre=$genre&isAskida=$isAskida&startDate=$startDate&endDate=$endDate');
 
   try {
     final response = await http.get(
