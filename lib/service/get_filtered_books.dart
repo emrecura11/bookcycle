@@ -5,7 +5,7 @@ import '../models/Book.dart';
 Future<List<Book>> getFilteredBooks(List<String> genres, bool? isAskida, String? startDate, String? endDate) async {
   final queryParams = {
     'genres': genres.isNotEmpty ? genres.join(',') : null,
-    'isAskida': isAskida?.toString() ?? 'false',
+    'isAskida': isAskida?.toString() ?? null,
     'startDate': startDate,
     'endDate': endDate,
   };

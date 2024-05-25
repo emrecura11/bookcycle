@@ -1,4 +1,6 @@
+import 'package:bookcycle/widgets/bottomnavbar.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signalr_core/signalr_core.dart';
 
 import '../models/User.dart';
@@ -6,9 +8,8 @@ import '../service/get_user_by_id.dart';
 import 'chatPage.dart';
 
 class ConversationListPage extends StatefulWidget {
-  final String userId;
 
-  const ConversationListPage({required this.userId, Key? key}) : super(key: key);
+  const ConversationListPage({ Key? key}) : super(key: key);
 
   @override
   _ConversationListPageState createState() => _ConversationListPageState();
@@ -17,6 +18,7 @@ class ConversationListPage extends StatefulWidget {
 class _ConversationListPageState extends State<ConversationListPage> {
   List<User> partners = [];
   late HubConnection _hubConnection;
+  late String userId;
 
 
   @override
@@ -27,6 +29,8 @@ class _ConversationListPageState extends State<ConversationListPage> {
     _hubConnection.on("ReceiveConversationPartners", handlePartners);
   }
   Future<void> _startListening() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('userId')!;
     try {
       await _hubConnection.start();
       fetchConversationPartners();
@@ -58,7 +62,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
   Future<void> fetchConversationPartners() async {
     try {
-      await _hubConnection.invoke("GetConversationPartners", args: [widget.userId]);
+      await _hubConnection.invoke("GetConversationPartners", args: [userId]);
     } catch (e) {
       print("Error fetching conversation partners: $e");
     }
@@ -68,7 +72,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ChatPage(senderId: widget.userId, receiverId: receiverId),
+        builder: (context) => ChatPage(senderId: userId, receiverId: receiverId),
       ),
     );
   }
@@ -76,7 +80,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Conversations")),
+      appBar: AppBar(title: Text("Mesajlar")),
       body: ListView.builder(
         itemCount: partners.length,
         itemBuilder: (context, index) {
@@ -94,6 +98,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
           );
         },
       ),
+      bottomNavigationBar: BottomNavBar(selectedIndex: 1,),
     );
   }
 }

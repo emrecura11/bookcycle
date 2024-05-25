@@ -15,7 +15,7 @@ class _FilterWidgetState extends State<FilterWidget> {
   String? selectedState;
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
-  bool _isSuspended = false;
+  bool? _isSuspended = null;
 
   List<String> genres = [
     'Şiir',
@@ -287,15 +287,26 @@ class _FilterWidgetState extends State<FilterWidget> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Checkbox(
+                    Text('Askıda Kitap?'),
+                    DropdownButton<bool>(
                       value: _isSuspended,
+                      items: [
+                        DropdownMenuItem<bool>(
+                          value: true,
+                          child: Text("Evet"),
+                        ),
+                        DropdownMenuItem<bool>(
+                          value: false,
+                          child: Text("Hayır"),
+                        ),
+                      ],
                       onChanged: (bool? newValue) {
                         setState(() {
                           _isSuspended = newValue!;
                         });
                       },
                     ),
-                    Text('Askıda Kitap?'),
+
                     SizedBox(width: height),
 
                   ],
