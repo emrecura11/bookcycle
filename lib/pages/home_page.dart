@@ -333,7 +333,7 @@ Widget headerTopCategories(BuildContext context) {
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
           children: <Widget>[
-            headerCategoryItem('Tarih', Icons.image_search_rounded, onPressed: () {
+            headerCategoryItem('Tarih', Icons.history_rounded, onPressed: () {
               List<String> listTarih = ["Tarih"];
               Future<List<Book>> list = getFilteredBooks(listTarih, null, null, null);
               Navigator.push(
@@ -343,7 +343,7 @@ Widget headerTopCategories(BuildContext context) {
                 ),
               );
             }),
-            headerCategoryItem('Şiir', Icons.image_search_rounded, onPressed: () {
+            headerCategoryItem('Şiir', Icons.history_edu, onPressed: () {
               List<String> listTarih = ["Şiir"];
               Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
               Navigator.push(
@@ -353,14 +353,75 @@ Widget headerTopCategories(BuildContext context) {
                 ),
               );
             }),
-            headerCategoryItem('Creamery', Icons.image_search_rounded, onPressed: () {
-              // Add your code here
+            headerCategoryItem('Kurgu', Icons.movie, onPressed: () {
+              List<String> listTarih = ["Kurgu"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
             }),
-            headerCategoryItem('Hot Drinks', Icons.image_search_rounded, onPressed: () {
-              // Add your code here
+            headerCategoryItem('Eğitim', Icons.book, onPressed: () {
+              List<String> listTarih = ["Eğitim"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
             }),
-            headerCategoryItem('Vegetables', Icons.image_search_rounded, onPressed: () {
-              // Add your code here
+            headerCategoryItem('Biyografi', Icons.account_circle, onPressed: () {
+              List<String> listTarih = ["Biyografi"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Bilim Kurgu', Icons.science_rounded, onPressed: () {
+              List<String> listTarih = ["Bilim Kurgu"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Polisiye', Icons.policy_rounded, onPressed: () {
+              List<String> listTarih = ["Polisiye"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Felsefe-Dini', Icons.mosque_rounded, onPressed: () {
+              List<String> listTarih = ["Felsefe-Dini"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Bilim-Teknoloji', Icons.computer_rounded , onPressed: () {
+              List<String> listTarih = ["Bilim-Teknoloji"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
             }),
           ],
         ),
@@ -378,14 +439,14 @@ Widget headerCategoryItem(String name, IconData icon, {onPressed}) {
       children: <Widget>[
         Container(
             margin: EdgeInsets.only(bottom: 10),
-            width: 70,
-            height: 70,
+            width: 60,
+            height: 60,
             child: FloatingActionButton(
               shape: CircleBorder(),
               heroTag: name,
               onPressed: onPressed,
               backgroundColor: Colors.white,
-              child: Icon(icon, size: 35, color: Colors.black87),
+              child: Icon(icon, size: 35, color: Colors.deepOrange),
             )),
         Text(name + ' ›')
       ],
