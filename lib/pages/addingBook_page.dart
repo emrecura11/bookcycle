@@ -49,6 +49,7 @@ class _AddBookPageState extends State<AddBookPage> {
     'Yıpranmış',
   ];
 
+
   void _showPicker({required BuildContext context}) {
     showModalBottomSheet(
       context: context,
@@ -106,10 +107,12 @@ class _AddBookPageState extends State<AddBookPage> {
     String? token = prefs.getString('jwtoken');
 
     final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Book');
+
     String? base64Image;
     if (galleryFile != null) {
       base64Image = await UploadImageService().uploadImageAsBase64(galleryFile!);
     }
+
     try {
       final response = await http.post(
         apiUrl,

@@ -23,10 +23,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
 
   Future<void> onBookmarkPressed(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? email = prefs.getString('email');
+    String? userId = prefs.getString('userId');
     Book book = await widget.bookFuture;
 
-    addFavorite(context, email!, book.id);
+    addFavorite(context, userId!, book.id);
   }
 
   @override

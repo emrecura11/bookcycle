@@ -1,5 +1,9 @@
+import 'package:bookcycle/service/get_filtered_books.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../models/Book.dart';
+import '../pages/fileter_results_page.dart';
 
 class FilterWidget extends StatefulWidget {
   @override
@@ -8,25 +12,40 @@ class FilterWidget extends StatefulWidget {
 
 class _FilterWidgetState extends State<FilterWidget> {
   String? selectedCity;
-  String? selectedGenre;
+  String? selectedState;
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
-  bool isAscending = true;
-  bool _isSuspended = false;
+  bool? _isSuspended = null;
 
-  List<String> genres = ['Şiir', 'Gerilim', 'Tarih-Coğrafya', 'Kişisel Gelişim', 'Siyaset', 'Eğitim','Çocuk','Felsefi'];
+  List<String> genres = [
+    'Şiir',
+    'Gerilim',
+    'Tarih-Coğrafya',
+    'Kişisel Gelişim',
+    'Siyaset',
+    'Eğitim',
+    'Çocuk',
+    'Felsefi',
+  ];
   List<String> cities = ['İstanbul', 'İzmir', 'Ankara', 'Antalya'];
-  List<bool> selectedGenres=[];
-  @override
-  void initState() {
-    super.initState();
-    // Assuming your genres list is already defined as an instance member
-    selectedGenres = List<bool>.generate(genres.length, (_) => false);
+  List<String> stateOfBook = ['Yeni', 'Eski', 'Yıpranmış'];
+
+  List<bool> selectedGenres = List<bool>.generate(8, (_) => false);
+
+  // Extract selected genres to a list
+  List<String> selectedGenresList() {
+    List<String> list = [];
+    for (int i = 0; i < genres.length; i++) {
+      if (selectedGenres[i]) {
+        list.add(genres[i]);
+      }
+    }
+    return list;
   }
 
   @override
   Widget build(BuildContext context) {
-    double height=MediaQuery.of(context).size.height*0.03;
+    double height = MediaQuery.of(context).size.height * 0.01;
     return Column(
       children: <Widget>[
         SizedBox(height: height),
@@ -80,33 +99,36 @@ class _FilterWidgetState extends State<FilterWidget> {
               'Başlangıç',
               style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
             ),
-             // Use Spacer to create equal spacing
             Text(
               'Bitiş',
               style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
             ),
           ],
         ),
-
-    IntrinsicWidth(
-    child: Row(
-           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-           children: <Widget>[
-             Expanded(
-               child: ElevatedButton.icon(
-                 icon: Icon(Icons.calendar_today, color: Colors.white),
-                 label: Text(
-                   selectedStartDate != null
-                       ? DateFormat('dd/MM/yyyy').format(selectedStartDate!)
-                       : '__/__/____',
-                   style: TextStyle(fontSize: 16.0, color: Colors.white, fontWeight: FontWeight.bold),
-                 ),
-                 style: ElevatedButton.styleFrom(
-                   backgroundColor: Colors.deepOrange.shade300,
-                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                   elevation: 5,
-                   padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                 ),
+        IntrinsicWidth(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Expanded(
+                child: ElevatedButton.icon(
+                  icon: Icon(Icons.calendar_today, color: Colors.white),
+                  label: Text(
+                    selectedStartDate != null
+                        ? DateFormat('dd/MM/yyyy').format(selectedStartDate!)
+                        : '__/__/____',
+                    style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrange.shade300,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                    elevation: 5,
+                    padding: EdgeInsets.symmetric(
+                        vertical: 10.0, horizontal: 20.0),
+                  ),
                   onPressed: () async {
                     final DateTime? picked = await showDatePicker(
                       context: context,
@@ -116,13 +138,15 @@ class _FilterWidgetState extends State<FilterWidget> {
                     );
 
                     if (picked != null) {
-                      if (selectedEndDate != null && picked.isAfter(selectedEndDate!)) {
+                      if (selectedEndDate != null &&
+                          picked.isAfter(selectedEndDate!)) {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: Text('Uyarı'),
-                              content: Text('Başlangıç tarihi,bitiş tarihinden sonra olamaz!'),
+                              content: Text(
+                                  'Başlangıç tarihi, bitiş tarihinden sonra olamaz!'),
                               actions: <Widget>[
                                 TextButton(
                                   child: Text('OK'),
@@ -143,22 +167,27 @@ class _FilterWidgetState extends State<FilterWidget> {
                   },
                 ),
               ),
-              Icon(Icons.arrow_forward, color: Colors.deepOrange.shade300),  // Right-pointing icon
-             Expanded(
-               child: ElevatedButton.icon(
-                 icon: Icon(Icons.calendar_today, color: Colors.white),
-                 label: Text(
-                   selectedEndDate != null
-                       ? DateFormat('dd/MM/yyyy').format(selectedEndDate!)
-                       : '__/__/____',
-                   style: TextStyle(fontSize: 16.0, color: Colors.white, fontWeight: FontWeight.bold),
-                 ),
-                 style: ElevatedButton.styleFrom(
-                   backgroundColor: Colors.deepOrange.shade300,
-                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                   elevation: 5,
-                   padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                 ),
+              Icon(Icons.arrow_forward, color: Colors.deepOrange.shade300),
+              Expanded(
+                child: ElevatedButton.icon(
+                  icon: Icon(Icons.calendar_today, color: Colors.white),
+                  label: Text(
+                    selectedEndDate != null
+                        ? DateFormat('dd/MM/yyyy').format(selectedEndDate!)
+                        : '__/__/____',
+                    style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrange.shade300,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                    elevation: 5,
+                    padding: EdgeInsets.symmetric(
+                        vertical: 10.0, horizontal: 20.0),
+                  ),
                   onPressed: () async {
                     final DateTime? picked = await showDatePicker(
                       context: context,
@@ -168,13 +197,15 @@ class _FilterWidgetState extends State<FilterWidget> {
                     );
 
                     if (picked != null) {
-                      if (selectedStartDate != null && picked.isBefore(selectedStartDate!)) {
+                      if (selectedStartDate != null &&
+                          picked.isBefore( selectedStartDate!.add(Duration(days: 1)))) {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: Text('Uyarı'),
-                              content: Text('Bitiş tarihi,başlangıç tarihinden önce olamaz!'),
+                              content: Text(
+                                  'Bitiş tarihi, başlangıç tarihiyle aynı veya önce olamaz!'),
                               actions: <Widget>[
                                 TextButton(
                                   child: Text('OK'),
@@ -197,13 +228,31 @@ class _FilterWidgetState extends State<FilterWidget> {
               ),
             ],
           ),
-    ),
-
-
-
-
-
-
+        ),
+        SizedBox(height: height),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            'Durum:',
+            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          ),
+        ),
+        SizedBox(height: height),
+        DropdownButton<String>(
+          hint: Text('Kitabın Durumu'),
+          value: selectedState,
+          onChanged: (String? newValue) {
+            setState(() {
+              selectedState = newValue;
+            });
+          },
+          items: stateOfBook.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+        ),
         SizedBox(height: height),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -229,75 +278,81 @@ class _FilterWidgetState extends State<FilterWidget> {
           }).toList(),
         ),
         SizedBox(height: height),
+
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Checkbox(
-                  value: _isSuspended,
-                  onChanged: (bool? newValue) {
-                    setState(() {
-                      _isSuspended = newValue!;
-                    });
+          child: Column(
+            children: [
+              Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text('Askıda Kitap?'),
+                    DropdownButton<bool>(
+                      value: _isSuspended,
+                      items: [
+                        DropdownMenuItem<bool>(
+                          value: true,
+                          child: Text("Evet"),
+                        ),
+                        DropdownMenuItem<bool>(
+                          value: false,
+                          child: Text("Hayır"),
+                        ),
+                      ],
+                      onChanged: (bool? newValue) {
+                        setState(() {
+                          _isSuspended = newValue!;
+                        });
+                      },
+                    ),
+
+                    SizedBox(width: height),
+
+                  ],
+                ),
+              ),
+              SizedBox(height: height*2),
+              Center(
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.deepOrange.shade300,
+                    padding: EdgeInsets.symmetric(
+                        vertical: 10.0, horizontal: 20.0),
+                  ),
+                  child: Text(
+                    'Uygula',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: () {
+                    String? startDate = selectedStartDate != null
+                        ? DateFormat('yyyy-MM-dd').format(selectedStartDate!)
+                        : null;
+                    String? endDate = selectedEndDate != null
+                        ? DateFormat('yyyy-MM-dd').format(selectedEndDate!)
+                        : null;
+
+                    Future<List<Book>> list = getFilteredBooks(
+                        selectedGenresList(), _isSuspended, startDate, endDate);
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            FilterResultsPage(books2: list),
+                      ),
+                    );
                   },
                 ),
-
-                Text('Askıda Kitap?'),
-
-
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        SizedBox(height: height),
       ],
     );
   }
-  List<String> getSelectedGenres() {
-    List<String> selectedGenresList = [];
-    for (int i = 0; i < selectedGenres.length; i++) {
-      if (selectedGenres[i]) {
-        selectedGenresList.add(genres[i]);
-      }
-    }
-    return selectedGenresList;
-  }
-
-  String? getSelectedCity() {
-    return selectedCity;
-  }
-
-  DateTime? getSelectedStartDate() {
-    return selectedStartDate;
-  }
-
-  DateTime? getSelectedEndDate() {
-    return selectedEndDate;
-  }
-
-  bool isAskidaSelected() {
-    return _isSuspended;
-  }
 }
-List<String> getSelectedGenres(_FilterWidgetState state) {
-  return state.getSelectedGenres();
-}
-
-String? getSelectedCity(_FilterWidgetState state) {
-  return state.getSelectedCity();
-}
-
-DateTime? getSelectedStartDate(_FilterWidgetState state) {
-  return state.getSelectedStartDate();
-}
-
-DateTime? getSelectedEndDate(_FilterWidgetState state) {
-  return state.getSelectedEndDate();
-}
-
-bool isAskidaSelected(_FilterWidgetState state) {
-  return state.isAskidaSelected();
-}
-

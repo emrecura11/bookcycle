@@ -4,13 +4,14 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<void> addFavorite(BuildContext context, String email, int bookId) async {
-  final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Favorites/Favorites');
+Future<void> addFavorite(BuildContext context, String userId, int bookId) async {
+  final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Favorites');
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('jwtoken');
 
   Map<String, dynamic> requestBody = {
-    'email': email,
+    'userId': userId,
     'bookId': bookId,
   };
 

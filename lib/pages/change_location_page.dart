@@ -120,7 +120,7 @@ class _ChangeLocationState extends State<ChangeLocation> {
           ),
         ),
       ),
-    bottomNavigationBar: BottomNavBar(),
+
     );
 
   }

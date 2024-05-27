@@ -1,52 +1,44 @@
-import 'package:bookcycle/service/delete_favorites.dart';
+import 'package:bookcycle/service/delete_book_by_id.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/Book.dart';
 import '../models/User.dart';
+import '../service/get_all_books.dart';
 import '../service/get_favorites.dart';
 import '../service/get_book_by_id.dart';
 import '../service/get_user_by_id.dart';
-import '../widgets/bottomnavbar.dart';
 import 'bookDetails_page.dart';
 
-class FavoritesPage extends StatefulWidget {
+class MyAdvertisementsPage extends StatefulWidget {
   @override
-  _FavoritesPageState createState() => _FavoritesPageState();
+  _MyAdvertisementsPageState createState() => _MyAdvertisementsPageState();
 }
 
-class _FavoritesPageState extends State<FavoritesPage> {
+class _MyAdvertisementsPageState extends State<MyAdvertisementsPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final List<int> bookIds = [];
-  final List<Book> books = [];
-  User currentUser = User(id: "", email: "", userName: "");
+   List<Book> books = [];
+  String userId ="";
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _loadFavorites();
+  void initState() {
+    super.initState();
+    getInfo();
   }
 
-
-  Future<void> _loadFavorites() async {
+  Future<void> getInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId');
+    userId = prefs.getString('userId')!;
+    var books2 = await getAllBooks();
 
-    currentUser = await getUserInfo(userId!);
-
-    print(userId);
-    try {
-      List<int> favoriteBookIds = await getFavorites(userId!,bookIds);
-      for (int bookId in favoriteBookIds) {
-        Book? book = await getBookById(bookId);
+    books2.forEach((element) {
+      if(element.createdBy == userId){
         setState(() {
-          books.add(book);
-          print(book.name);
+          books.add(element);
         });
-            }
-    } catch (error) {
-      print('Error fetching favorites: $error');
-    }
+      }
+    });
   }
+
 
   final List<List<Color>> colorPairs = [
     [Color(0xFFee8959), Colors.white],
@@ -76,7 +68,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 child: Align(
                   alignment: Alignment.center,
                   child: Text(
-                    "Favorilerim",
+                    "İlanlarım",
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.black,
@@ -186,7 +178,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                                         ),
                                                       IconButton(
                                                         onPressed: () {
-                                                          deleteFavorite(currentUser.id,books[index].id).then((_) {
+                                                          deleteBook(books[index].id).then((_) {
                                                             setState(() {
                                                               books.removeAt(index);
                                                             });
@@ -229,7 +221,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavBar(selectedIndex: 3,),
     );
   }
 }

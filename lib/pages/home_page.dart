@@ -1,4 +1,8 @@
+
+import 'package:bookcycle/pages/fileter_results_page.dart';
+
 import 'dart:convert';
+
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,100 +50,45 @@ class _HomePageState extends State<HomePage> {
     [Colors.white, Colors.white],
   ];
 
-  void _applyFilters(String genre, bool? isAskida, String startDate, String endDate) async {
-    try {
-      final List<Book> filteredBooks = await getFilteredBooks(genre, isAskida, startDate, endDate);
-      setState(() {
-        _filteredBooks = filteredBooks;
-      });
-      Navigator.of(context).pop(); // Close the bottom sheet after applying filters
-    } catch (e) {
-      // Handle error
-      print('Error applying filters: $e');
-    }
-  }
-
   void _showFilterDialog(BuildContext context) {
-    double height=MediaQuery.of(context).size.height*0.04;
-    FilterWidget filterWidget = FilterWidget();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-
-        return Container(
-          decoration: BoxDecoration(
-            color: Color(0xFFFDFDFD),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
-            ),
-          ),
-          padding: EdgeInsets.all(16.0),
-          height:  MediaQuery.of(context).size.height*0.8 ,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min, // İçerik boyutuna göre boyutlandır
-              children: <Widget>[
-                Text(
-                  'Filtreleme',
-                  style: TextStyle(
-                    fontSize: 26.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Color(0xFFFDFDFD),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15),
+                  topRight: Radius.circular(15),
                 ),
-                SingleChildScrollView(
-                  child: filterWidget,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              ),
+              padding: EdgeInsets.all(16.0),
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.deepOrange.shade300,
-                        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                    Text(
+                      'Filtreleme',
+                      style: TextStyle(
+                        fontSize: 26.0,
+                        fontWeight: FontWeight.bold,
                       ),
-                      child: Text(
-                        'İptal',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
                     ),
-                    SizedBox(width: height),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.deepOrange.shade300,
-                        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                      ),
-                      child: Text(
-                        'Uygula',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onPressed: () {
-
-                      },
-                    ),
+                    FilterWidget(),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
-
 
   void _filterBooks(String query) {
     setState(() {
@@ -164,9 +113,7 @@ class _HomePageState extends State<HomePage> {
               Text(
                 'bookcycle',
                 style: TextStyle(
-                    fontFamily: 'LexendExa',
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold),
+                    fontSize: 24, fontWeight: FontWeight.bold),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -196,11 +143,13 @@ class _HomePageState extends State<HomePage> {
                         onPressed: () {},
                       ),
                       IconButton(
-                        icon: Icon(
-                          Icons.filter_list,
-                          color: Colors.black,
-                        ),
-                        onPressed: () => _showFilterDialog(context),
+                          icon: Icon(
+                            Icons.filter_list,
+                            color: Colors.black,
+                          ),
+                          onPressed: () {
+                            _showFilterDialog(context);
+                          }
                       ),
                     ],
                   ),
@@ -208,6 +157,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
+          headerTopCategories(context),
           SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.only(left: 16, bottom: 8),
@@ -255,13 +205,12 @@ class _HomePageState extends State<HomePage> {
                           );
                         },
                         child: Card(
-
                           margin: EdgeInsets.symmetric(
                               horizontal: 10, vertical: 10),
                           elevation: 5,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
-                              side: BorderSide(color: Colors.black, width: 1),),
+                              side: BorderSide(color: Colors.black, width: 1)),
                           child: Container(
                             decoration: BoxDecoration(
                               gradient: gradient,
@@ -276,6 +225,7 @@ class _HomePageState extends State<HomePage> {
                                       margin: EdgeInsets.all(8.0),
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.horizontal(
+
                                           left: Radius.circular(8),
                                           right: Radius.circular(8),
                                         ),
@@ -291,6 +241,7 @@ class _HomePageState extends State<HomePage> {
                                                 "images/book1.jpg",
                                                 fit: BoxFit.cover);
                                           },
+
                                         )
                                             : Image.asset(
                                           "images/book1.jpg",
@@ -305,24 +256,27 @@ class _HomePageState extends State<HomePage> {
                                       padding: EdgeInsets.all(10),
                                       child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
+                                        MainAxisAlignment.spaceAround,
                                         children: <Widget>[
                                           Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                            MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                 book.name,
                                                 style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
+                                                  fontWeight:
+                                                  FontWeight.bold,
                                                 ),
-                                                overflow: TextOverflow.ellipsis,
+                                                overflow:
+                                                TextOverflow.ellipsis,
                                               ),
                                               if (book.isAskida)
                                                 Icon(
-                                                  Icons.volunteer_activism,
+                                                  Icons
+                                                      .volunteer_activism,
                                                   color: Color(0xFF76C893),
                                                 )
                                               else
@@ -337,7 +291,8 @@ class _HomePageState extends State<HomePage> {
                                           Text("Kategori: ${book.genre}"),
                                           Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                            MainAxisAlignment
+                                                .spaceBetween,
                                             children: [
                                               Text(
                                                   "Kullanıcı: ${user.userName}"),
@@ -364,7 +319,153 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(),
+      bottomNavigationBar: BottomNavBar(selectedIndex: 0),
     );
   }
+}
+
+Widget sectionHeader(String headerTitle, {onViewMore}) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      Container(
+        margin: EdgeInsets.only(left: 15, top: 10),
+        child: Text(headerTitle),
+      ),
+    ],
+  );
+}
+
+Widget headerTopCategories(BuildContext context) {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: <Widget>[
+      sectionHeader('Tüm Kategoriler', onViewMore: () {}),
+      SizedBox(
+        height: 100,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          children: <Widget>[
+            headerCategoryItem('Tarih', Icons.history_rounded, onPressed: () {
+              List<String> listTarih = ["Tarih"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, null, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Şiir', Icons.history_edu, onPressed: () {
+              List<String> listTarih = ["Şiir"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Kurgu', Icons.movie, onPressed: () {
+              List<String> listTarih = ["Kurgu"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Eğitim', Icons.book, onPressed: () {
+              List<String> listTarih = ["Eğitim"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Biyografi', Icons.account_circle, onPressed: () {
+              List<String> listTarih = ["Biyografi"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Bilim Kurgu', Icons.science_rounded, onPressed: () {
+              List<String> listTarih = ["Bilim Kurgu"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Polisiye', Icons.policy_rounded, onPressed: () {
+              List<String> listTarih = ["Polisiye"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Felsefe-Dini', Icons.mosque_rounded, onPressed: () {
+              List<String> listTarih = ["Felsefe-Dini"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+            headerCategoryItem('Bilim-Teknoloji', Icons.computer_rounded , onPressed: () {
+              List<String> listTarih = ["Bilim-Teknoloji"];
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FilterResultsPage(books2: list),
+                ),
+              );
+            }),
+          ],
+        ),
+      )
+    ],
+  );
+}
+
+Widget headerCategoryItem(String name, IconData icon, {onPressed}) {
+  return Container(
+    margin: EdgeInsets.only(left: 15),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Container(
+            margin: EdgeInsets.only(bottom: 10),
+            width: 60,
+            height: 60,
+            child: FloatingActionButton(
+              shape: CircleBorder(),
+              heroTag: name,
+              onPressed: onPressed,
+              backgroundColor: Colors.white,
+              child: Icon(icon, size: 35, color: Colors.deepOrange),
+            )),
+        Text(name + ' ›')
+      ],
+    ),
+  );
 }

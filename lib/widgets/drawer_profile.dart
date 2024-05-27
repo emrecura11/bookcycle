@@ -4,18 +4,28 @@ import 'package:flutter/material.dart';
 import 'package:bookcycle/pages/change_location_page.dart';
 import 'package:bookcycle/pages/change_password_page.dart';
 import 'package:bookcycle/pages/edit_profile_page.dart';
+import 'package:bookcycle/pages/login_page.dart';
+import 'package:bookcycle/pages/my_advertisements_page.dart';
+import 'package:flutter/material.dart';
+
 import 'package:bookcycle/pages/my_advertisements.dart';
 import 'package:bookcycle/models/User.dart';
 import 'package:bookcycle/service/get_user_by_id.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../service/delete_user.dart';
 
 class ProfileDrawer extends StatefulWidget {
+  final String userId;
+
+  ProfileDrawer({required this.userId});
+
   @override
   _ProfileDrawerState createState() => _ProfileDrawerState();
 }
 
 class _ProfileDrawerState extends State<ProfileDrawer> {
+
   Future<User>? userFuture;
 
   void initState() {
@@ -39,6 +49,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
     return Drawer(
       child: ListView(
         children: <Widget>[
+
           const SizedBox(height: 20),
           FutureBuilder<User>(
             future: userFuture,
@@ -73,6 +84,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
               }
               return Text("No user data available");
             },
+
           ),
           const SizedBox(height: 20),
           const Divider(
@@ -80,6 +92,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
             height: 1,
             thickness: 0.5,
           ),
+
           const SizedBox(height: 20),
           buildDrawerItem(
             icon: Icons.person,
@@ -102,21 +115,30 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyAdvertisements()),
+                MaterialPageRoute(
+                    builder: (context) => MyAdvertisementsPage()),
               );
             },
           ),
           buildDrawerItem(
             icon: Icons.logout,
+
             text: "Çıkış yap",
             onTap: () {
-              // Handle Logout tap
+              logout();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => LoginPage()),
+                      (Route<dynamic> route) => false
+              );
             },
           ),
         ],
       ),
     );
   }
+
 
 
   Widget buildDrawerItem({required IconData icon, required String text, required void Function() onTap}) {
@@ -141,54 +163,112 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
       ),
     );
   }
-}
-void _showEditProfileBottomSheet(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(20.0),
-        topRight: Radius.circular(20.0),),
-    ),
-    builder: (BuildContext context) {
-      return Container(
-        padding: EdgeInsets.all(20),
-        child: Wrap(
-          children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              child: Text(
-                'Güvenlik',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
+
+  void _showEditProfileBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Wrap(
+            children: <Widget>[
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                child: Text(
+                  'Güvenlik',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-
-            const Divider(thickness: 2,),
-
-
-
-            ListTile(
-              leading:  Icon(
-                  Icons.lock,
-                  color: Colors.deepOrange.shade300
+              const Divider(
+                thickness: 2,
               ),
-              title: Text('Şifre Değiştirme'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  ChangePassword()),
-                );
+              ListTile(
+                leading: Icon(
+                  Icons.location_on,
+                  color: Colors.deepOrange.shade300,
+                ),
+                title: Text('Hesabı Sil'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showDeleteAccountDialog(context);
+                },
+              ),
+              const Divider(
+                thickness: 1,
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.lock,
+                  color: Colors.deepOrange.shade300,
+                ),
+                title: Text('Şifreyi Değiştir'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ChangePassword()),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteAccountDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Hesabı Sil"),
+          content: Text("Hesabınızı silmek istediğinizden emin misiniz?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Hayır"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Evet"),
+              onPressed: () {
+                bool isDeleted = deleteUserAccount(widget.userId) as bool;
+                if(isDeleted){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                }else{
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Hesap silinemedi!')));
+                }
+
               },
             ),
           ],
-        ),
-      );
-    },
-  );
+        );
+      },
+    );
+  }
+  Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('jwtoken');
+    prefs.remove('userName');
+    prefs.remove('userId');
+    prefs.remove('email');
+    prefs.remove('password');
+  }
 }
 
 Widget buildDrawerItem({required IconData icon, required String text, required void Function() onTap}) {
@@ -198,3 +278,4 @@ Widget buildDrawerItem({required IconData icon, required String text, required v
     onTap: onTap,
   );
 }
+
