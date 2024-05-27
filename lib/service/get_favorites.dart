@@ -8,6 +8,7 @@ Future<List<int>> getFavorites(String userId, List<int> idList) async {
 
   final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Favorites?userId=$userId');
 
+
   try {
     http.Response response = await http.get(
       apiUrl,

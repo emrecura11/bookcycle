@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import 'dart:io';
+
 import 'package:bookcycle/pages/chatPage.dart';
 import 'package:bookcycle/service/get_all_books.dart';
 import 'package:bookcycle/service/get_book_by_id.dart';
@@ -86,6 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
       key: _scaffoldKey,
       drawer: ProfileDrawer(userId: userId,),
       backgroundColor: Colors.white,
+
       floatingActionButton: _userIsCurrent && _isShowingWishlist
           ? FloatingActionButton(
         onPressed: () {
@@ -94,12 +97,22 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Icon(Icons.add),
       ) : null,
 
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+   
+
+    body: FutureBuilder<User>(
+    future: widget.userFuture,
+    builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.done) {
+    if (snapshot.hasError) {
+    return Center(child: Text("Error: ${snapshot.error}"));
+    } else if (snapshot.hasData) {
+    User user = snapshot.data!;
+    return SingleChildScrollView(
+    child: Center(
+    child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
 
               Visibility(
                 visible: _userIsCurrent,
@@ -114,16 +127,24 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ),
-              const Padding(
+
+
+
+               Padding(
                 padding: EdgeInsets.only(top: 20.0),
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: CircleAvatar(
                     radius: 70,
-                    backgroundImage: AssetImage('images/logo_bookcycle.jpeg'),
+                    backgroundImage:user.userImage != null
+                        ? (user.userImage!.startsWith('http')
+                        ? NetworkImage(user.userImage!) // URL olarak kullan
+                        : MemoryImage(base64Decode(user.userImage!)) as ImageProvider<Object>) // Base64 string
+                        : const AssetImage('images/logo_bookcycle.jpeg'),
                   ),
                 ),
               ),
+
               const SizedBox(height: 16),
               Align(
                 alignment: Alignment.topCenter,
@@ -137,6 +158,19 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.topCenter,
+                child: Text(
+                  user.description ?? '', // Displaying description
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -145,7 +179,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Color(0xFF88C4A8),
                   ),
                   Text(
-                    user.email,
+                    user.location??'Bilinmiyor',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black,
@@ -223,6 +257,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             color: _isShowingWishlist ? Colors.deepOrange.shade300 : Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
+
                         ),
                       ),
                     ),
@@ -291,6 +326,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     wishlist2[index].name,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
+
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -390,24 +426,34 @@ class _ProfilePageState extends State<ProfilePage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.horizontal(
-                                left: Radius.circular(8), right: Radius.circular(8)),
-                            child: books[index].bookImage != null
-                                ? Image.asset(
-                              books[index].bookImage!,
-                              fit: BoxFit.cover,
-                            )
-                                : Image.asset(
-                              "images/book1.jpg",
-                              fit: BoxFit.cover,
-                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.all(8.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.horizontal(
+                                        left: Radius.circular(8),
+                                        right: Radius.circular(8),
+                                      ),
+                                      child: book.bookImage != null &&
+                                          book.bookImage!.isNotEmpty
+                                          ? Image.memory(
+                                        base64Decode(base64.normalize(
+                                            book.bookImage!)),
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error,
+                                            stackTrace) {
+                                          return Image.asset(
+                                              "images/book1.jpg",
+                                              fit: BoxFit.cover);
+                                        },
+                                      )
+                                          : Image.asset(
+                                        "images/book1.jpg",
+                                        fit: BoxFit.cover,
+                                      ),
                           ),
                         ),
                         flex: 1,
@@ -589,6 +635,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         );
       },
+  
     );
   }
 

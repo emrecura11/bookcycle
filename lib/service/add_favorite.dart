@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> addFavorite(BuildContext context, String userId, int bookId) async {
   final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Favorites');
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('jwtoken');
 

@@ -14,6 +14,7 @@ Future<void> signUpUser(BuildContext context, String username, String email,
       "confirmPassword": confirmPassword
     };
 
+
     try {
       http.Response response = await http.post(
         Uri.parse(apiUrl),

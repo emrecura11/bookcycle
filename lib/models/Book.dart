@@ -5,8 +5,9 @@ class Book {
   final String genre;
   final String stateOfBook;
   final String description;
+  final String location;
   final bool isAskida;
-  final String? bookImage;
+  final String bookImage;
   final String createdBy;
   final String created;
   final String? lastModifiedBy;
@@ -19,8 +20,9 @@ class Book {
     required this.genre,
     required this.stateOfBook,
     required this.description,
+    required this.location,
     required this.isAskida,
-    this.bookImage,
+    required this.bookImage,
     required this.createdBy,
     required this.created,
     this.lastModifiedBy,
@@ -35,6 +37,7 @@ class Book {
       genre: json['genre'],
       stateOfBook: json['stateOfBook'],
       description: json['description'],
+      location: json['location'],
       isAskida: json['isAskida'],
       bookImage: json['bookImage'],
       createdBy: json['createdBy'],

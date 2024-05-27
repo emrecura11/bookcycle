@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -95,12 +97,15 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                               left: Radius.circular(8),
                               right: Radius.circular(8),
                             ),
-                            child: book.bookImage != null
-                                ? Image.asset(
-                              book.bookImage!,
+                            child: book.bookImage != null && book.bookImage!.isNotEmpty
+                                ? Image.memory(
+                              base64Decode(base64.normalize(book.bookImage!)),
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset("images/book1.jpg", fit: BoxFit.cover);
+                              },
                             )
-                                : Placeholder(),
+                                : Image.asset("images/book1.jpg", fit: BoxFit.cover),
                           ),
                         ),
                         const Padding(
@@ -154,7 +159,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                 children: <Widget>[
                                   Icon(Icons.location_on, color: Colors.grey),
                                   SizedBox(width: 4.0),
-                                  Text('Antalya'),
+                                  Text(book.location),
                                   Spacer(),
                                   Text("Tarih: ${book.created.substring(0,7)}"),
                                 ],
@@ -198,7 +203,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        Text('Yeni gibi'),
+                                        Text(book.stateOfBook),
                                       ],
                                     ),
                                   ),
@@ -235,7 +240,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                   height: MediaQuery.of(context).size.height *
                                       0.2,
                                   child: Text(
-                                    'Farabi’ye göre, felsefenin dört klasik sorusundan “ne yapmalı?”, “neyi bilebiliriz?” ve “insan nedir?” soruları, “varlık nedir?” sorusuna bağımlıdır. Varlık nedir sorusu cevaplandırıldığı zaman diğer soruların cevabı da belirlenmiş olur. Farabi’nin felsefesi, ahlak ve metafizik anlayışını birbirinden bağımsız olarak değerlendirmek yanlış olacaktır.',
+                                    book.description,
                                     overflow: TextOverflow.clip,
                                   ),
                                 ),
@@ -312,7 +317,6 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                 thickness: 1,
                               ),
                               SizedBox(height: 16.0),
-                              Text('İlan no:3782368'),
                             ],
                           ),
                         ),

@@ -15,6 +15,7 @@ Future<List<Book>> getFilteredBooks(List<String> genres, bool? isAskida, String?
   // Build URI with the encoded query parameters
   final uri = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Book/filter').replace(queryParameters: filteredParams);
 
+
   try {
     // Log the final URI with all parameters
     print('API request URL: $uri');
