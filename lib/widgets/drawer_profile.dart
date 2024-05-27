@@ -8,7 +8,6 @@ import 'package:bookcycle/pages/login_page.dart';
 import 'package:bookcycle/pages/my_advertisements_page.dart';
 import 'package:flutter/material.dart';
 
-import 'package:bookcycle/pages/my_advertisements.dart';
 import 'package:bookcycle/models/User.dart';
 import 'package:bookcycle/service/get_user_by_id.dart';
 import 'package:shared_preferences/shared_preferences.dart';

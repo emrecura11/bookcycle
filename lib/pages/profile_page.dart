@@ -102,174 +102,189 @@ class _ProfilePageState extends State<ProfilePage> {
     body: FutureBuilder<User>(
     future: widget.userFuture,
     builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.done) {
-    if (snapshot.hasError) {
-    return Center(child: Text("Error: ${snapshot.error}"));
-    } else if (snapshot.hasData) {
-    User user = snapshot.data!;
-    return SingleChildScrollView(
-    child: Center(
-    child: Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-
-              Visibility(
-                visible: _userIsCurrent,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 30),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: IconButton(
-                      icon: const Icon(Icons.menu, color: Colors.black),
-                      onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                    ),
-                  ),
-                ),
-              ),
-
-
-
-               Padding(
-                padding: EdgeInsets.only(top: 20.0),
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: CircleAvatar(
-                    radius: 70,
-                    backgroundImage:user.userImage != null
-                        ? (user.userImage!.startsWith('http')
-                        ? NetworkImage(user.userImage!) // URL olarak kullan
-                        : MemoryImage(base64Decode(user.userImage!)) as ImageProvider<Object>) // Base64 string
-                        : const AssetImage('images/logo_bookcycle.jpeg'),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  user.userName,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  user.description ?? '', // Displaying description
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
+      if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (snapshot.hasData) {
+          User user = snapshot.data!;
+          return SingleChildScrollView(
+            child: Center(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.location_on,
-                    color: Color(0xFF88C4A8),
-                  ),
-                  Text(
-                    user.location??'Bilinmiyor',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
+
+                  Visibility(
+                    visible: _userIsCurrent,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 30),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: IconButton(
+                          icon: const Icon(Icons.menu, color: Colors.black),
+                          onPressed: () =>
+                              _scaffoldKey.currentState?.openDrawer(),
+                        ),
+                      ),
                     ),
+                  ),
+
+
+                  Padding(
+                    padding: EdgeInsets.only(top: 20.0),
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: CircleAvatar(
+                        radius: 70,
+                        backgroundImage: user.userImage != null
+                            ? (user.userImage!.startsWith('http')
+                            ? NetworkImage(user.userImage!) // URL olarak kullan
+                            : MemoryImage(
+                            base64Decode(user.userImage!)) as ImageProvider<
+                            Object>) // Base64 string
+                            : const AssetImage('images/logo_bookcycle.jpeg'),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Text(
+                      user.userName,
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Text(
+                      user.description ?? '', // Displaying description
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        color: Color(0xFF88C4A8),
+                      ),
+                      Text(
+                        user.location ?? 'Bilinmiyor',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Visibility(
+                    visible: !_userIsCurrent,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.messenger,
+                          color: Color(0xFF88C4A8),
+                        ),
+                        BasicButton(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ChatPage(
+                                      senderId: userId, receiverId: user.id,),
+                              ),
+                            );
+                          },
+                          buttonText: "Get Contact",
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(
+                    color: Colors.black,
+                    height: 1,
+                    thickness: 0.5,
+                  ),
+                  const SizedBox(height: 10),
+
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isShowingWishlist = false;
+                            });
+                          },
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "İlanlarım",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: _isShowingWishlist
+                                    ? Colors.black
+                                    : Colors
+                                    .deepOrange.shade300,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isShowingWishlist = true;
+                            });
+                          },
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "İstek Listesi",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: _isShowingWishlist ? Colors.deepOrange
+                                    .shade300 : Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    child: _isShowingWishlist
+                        ? _buildWishlistListView()
+                        : _buildAdvertisementListView(),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              Visibility(
-                visible: !_userIsCurrent,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.messenger,
-                      color: Color(0xFF88C4A8),
-                    ),
-                    BasicButton(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ChatPage(senderId: userId, receiverId: user.id,),
-                          ),
-                        );
-                      },
-                      buttonText: "Get Contact",
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Divider(
-                color: Colors.black,
-                height: 1,
-                thickness: 0.5,
-              ),
-              const SizedBox(height: 10),
-
-              Padding(
-                padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isShowingWishlist = false;
-                        });
-                      },
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "İlanlarım",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: _isShowingWishlist ? Colors.black : Colors.deepOrange.shade300,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isShowingWishlist = true;
-                        });
-                      },
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "İstek Listesi",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: _isShowingWishlist ? Colors.deepOrange.shade300 : Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                child: _isShowingWishlist ? _buildWishlistListView() : _buildAdvertisementListView(),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        }
+      }
+      return Center(child: CircularProgressIndicator(),);
+    }
       ),
       bottomNavigationBar: BottomNavBar(selectedIndex: 4,),
     );
@@ -437,11 +452,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                         left: Radius.circular(8),
                                         right: Radius.circular(8),
                                       ),
-                                      child: book.bookImage != null &&
-                                          book.bookImage!.isNotEmpty
+                                      child: books[index].bookImage != null &&
+                                          books[index].bookImage!.isNotEmpty
                                           ? Image.memory(
                                         base64Decode(base64.normalize(
-                                            book.bookImage!)),
+                                            books[index].bookImage!)),
                                         fit: BoxFit.cover,
                                         errorBuilder: (context, error,
                                             stackTrace) {

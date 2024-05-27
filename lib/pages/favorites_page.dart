@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bookcycle/service/delete_favorites.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -137,12 +139,21 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                           margin: EdgeInsets.all(8.0),
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.horizontal(
-                                                left: Radius.circular(8),
-                                                right: Radius.circular(8)),
-                                            child: books[index].bookImage != null
-                                                ? Image.asset(
-                                              books[index].bookImage!,
+                                              left: Radius.circular(8),
+                                              right: Radius.circular(8),
+                                            ),
+                                            child: books[index].bookImage != null &&
+                                                books[index].bookImage!.isNotEmpty
+                                                ? Image.memory(
+                                              base64Decode(base64.normalize(
+                                                  books[index].bookImage!)),
                                               fit: BoxFit.cover,
+                                              errorBuilder: (context, error,
+                                                  stackTrace) {
+                                                return Image.asset(
+                                                    "images/book1.jpg",
+                                                    fit: BoxFit.cover);
+                                              },
                                             )
                                                 : Image.asset(
                                               "images/book1.jpg",

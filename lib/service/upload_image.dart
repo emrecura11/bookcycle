@@ -13,7 +13,7 @@ class UploadImageService {
     if (originalImage == null) {
       throw Exception("Resim dosyası bozuk veya desteklenmeyen format.");
     }
-    img.Image resizedImage = img.copyResize(originalImage, width: 300, height: 300);
+    img.Image resizedImage = img.copyResize(originalImage, width: 350, height: 450);
 
     // Byte array'i Base64 formatına dönüştür
     final String base64Image = base64Encode(img.encodeJpg(resizedImage, quality: 60)); // Kalite ayarı
