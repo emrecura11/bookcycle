@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:bookcycle/service/get_user_by_id.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:signalr_core/signalr_core.dart';
 import '../models/MessageModel.dart';
+import '../models/User.dart';
 
 class ChatPage extends StatefulWidget {
   final String senderId;
@@ -18,15 +21,39 @@ class _ChatPageState extends State<ChatPage> {
   late HubConnection _hubConnection;
   List<Message> messages = [];
   final ScrollController _scrollController = ScrollController();
-
+  final TextEditingController _textEditingController = TextEditingController();
+  bool _isConnected = false;
+  User user = User(id: "", email: "", userName: "");
 
   @override
   void initState() {
     super.initState();
-    _hubConnection = HubConnectionBuilder().withUrl("https://bookcycle.azurewebsites.net/chathub").build();
-    _startListening();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    _hubConnection = HubConnectionBuilder()
+        .withUrl("https://bookcycle.azurewebsites.net/chathub")
+        .withAutomaticReconnect()
+        .build();
 
+    _hubConnection.onclose((error) {
+      setState(() {
+        _isConnected = false;
+      });
+      print("Connection closed: $error");
+    });
+
+    _startListening();
+    getUser();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  }
+
+  @override
+  void dispose() {
+    _hubConnection.stop();
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
+  void getUser() async{
+    user = await getUserInfo(widget.receiverId);
   }
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
@@ -37,11 +64,13 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> _startListening() async {
     try {
       await _hubConnection.start();
+      setState(() {
+        _isConnected = true;
+      });
       getMessages();
-      // Subscribe to receive messages
       _hubConnection.on("ReceiveMessages", handleMessage);
-    }catch(e){
-
+    } catch (e) {
+      print("Error starting connection: $e");
     }
   }
 
@@ -52,11 +81,11 @@ class _ChatPageState extends State<ChatPage> {
     }
     var nestedList = arguments.first;
     if (nestedList is List) {
-      messages.clear();
+      List<Message> newMessages = [];
       for (var json in nestedList) {
         if (json is Map<String, dynamic>) {
           try {
-            messages.add(Message.fromJson(Map<String, dynamic>.from(json)));
+            newMessages.add(Message.fromJson(Map<String, dynamic>.from(json)));
           } catch (e) {
             print('Error processing message: $e');
           }
@@ -64,33 +93,27 @@ class _ChatPageState extends State<ChatPage> {
           print('Invalid format: Expected Map<String, dynamic>, got ${json.runtimeType}');
         }
       }
+      setState(() {
+        messages = newMessages;
+        getMessages();
+      });
     } else {
       print('Invalid format: Expected a nested list, got ${nestedList.runtimeType}');
     }
 
-    // Check if messages were collected successfully
     if (messages.isEmpty) {
       print('No valid messages processed.');
-    } else {
-      setState(() {
-
-      });
     }
   }
-
-
-
 
   Future<void> getMessages() async {
     try {
       await _hubConnection.invoke(
           "GetMessages", args: [widget.senderId, widget.receiverId]);
     } catch (e) {
-
+      print("Error getting messages: $e");
     }
   }
-
-
 
   Future<void> sendMessage(String senderId, String receiverId, String message) async {
     try {
@@ -102,14 +125,16 @@ class _ChatPageState extends State<ChatPage> {
       print("Error sending message: $e");
     }
   }
-
-  final TextEditingController _textEditingController = TextEditingController();
+  String _formatTimestamp(String timestamp) {
+    DateTime dateTime = DateTime.parse(timestamp);
+    return DateFormat('HH:mm').format(dateTime);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat'),
+        title: Text(user.userName),
       ),
       body: Column(
         children: [
@@ -130,9 +155,18 @@ class _ChatPageState extends State<ChatPage> {
                         color: isSentByUser ? Colors.blue : Colors.grey,
                         borderRadius: BorderRadius.circular(12.0),
                       ),
-                      child: Text(
-                        message.message,
-                        style: TextStyle(color: Colors.white),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            message.message,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          Text(
+                            _formatTimestamp(message.timestamp),
+                            style: TextStyle(color: Colors.white70, fontSize: 10),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -148,7 +182,7 @@ class _ChatPageState extends State<ChatPage> {
                   child: TextField(
                     controller: _textEditingController,
                     decoration: InputDecoration(
-                      hintText: 'Type your message...',
+                      hintText: 'Mesaj...',
                     ),
                   ),
                 ),
@@ -156,7 +190,6 @@ class _ChatPageState extends State<ChatPage> {
                   icon: Icon(Icons.send),
                   onPressed: () {
                     sendMessage(widget.senderId, widget.receiverId, _textEditingController.text);
-                    // Clear the text field after sending the message
                     _textEditingController.clear();
                   },
                 ),
