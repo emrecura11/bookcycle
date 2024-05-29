@@ -7,6 +7,7 @@ import '../models/Book.dart';
 import '../models/User.dart';
 import '../service/add_favorite.dart';
 import '../service/get_user_by_id.dart';
+import '../widgets/book_report_widget.dart';
 import 'profile_page.dart';
 
 class BookDetailsPage extends StatefulWidget {
@@ -20,14 +21,43 @@ class BookDetailsPage extends StatefulWidget {
 
 class _BookDetailsPageState extends State<BookDetailsPage> {
   late Future<User> _userFuture;
+  String? userId; // Class-level variable
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId().then((_) { // Ensure user ID is loaded
+      setState(() {}); // Rebuild the widget once user ID is loaded
+    });
+  }
+
+  Future<void> _loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('userId');
+  }
 
   Future<void> onBookmarkPressed(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId');
     Book book = await widget.bookFuture;
-
-    addFavorite(context, userId!, book.id);
+    if (userId != null) {
+      addFavorite(context, userId!, book.id);
+    }
   }
+
+  Future<void> onReportPressed(BuildContext context, int bookId) async {
+    if (userId != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return ReportBook(reportedBookId: bookId, reportingUserId: userId!);
+        },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("You need to be logged in to report an issue."))
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +99,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                     actions: <Widget>[
+                      if (userId != book.createdBy)
                       IconButton(
                         icon: Icon(Icons.favorite_border),
                         color: Colors.black,
@@ -76,6 +107,11 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                           onBookmarkPressed(context);
                         },
                       ),
+                  if (userId != book.createdBy)
+                  IconButton(
+                  icon: Icon(Icons.report_problem, color: Colors.amber),
+                  onPressed: () => onReportPressed(context, book.id),
+                  ),
                     ],
                     backgroundColor: Colors.transparent,
                     elevation: 0,
@@ -309,6 +345,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                     ),
                                     onPressed: () {},
                                   ),
+
                                 ],
                               ),
                               const Divider(
