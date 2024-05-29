@@ -17,6 +17,7 @@ import '../models/Book.dart';
 import '../models/User.dart';
 import '../models/Wishlist.dart';
 import '../widgets/bottomnavbar.dart';
+import '../widgets/user_report_widget.dart';
 import 'bookDetails_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -74,7 +75,23 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     return false; // Varsayılan olarak false döndür
   }
-
+  Future<void> onReportPressed(BuildContext context, String reportedUserId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');  // Get current user's ID
+    if (userId != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // Assuming UserReportWidget takes the reporting user's ID and the reported user's ID
+          return UserReportWidget(reportingUserId: userId, reportedUserId: reportedUserId);
+        },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("You need to be logged in to report an issue."))
+      );
+    }
+  }
   final List<List<Color>> colorPairs = [
     [Color(0xFFee8959), Colors.white],
     [Color(0xFFf4a261), Colors.white],
@@ -97,7 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Icon(Icons.add),
       ) : null,
 
-   
+
 
     body: FutureBuilder<User>(
     future: widget.userFuture,
@@ -210,7 +227,11 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             );
                           },
-                          buttonText: "Get Contact",
+                          buttonText: "Mesaj",
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.report_problem, color: Colors.amber),
+                          onPressed: () => onReportPressed(context, user.id),
                         ),
                       ],
                     ),
@@ -237,7 +258,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: Align(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              "İlanlarım",
+                              "İlanlar",
                               style: TextStyle(
                                 fontSize: 18,
                                 color: _isShowingWishlist
