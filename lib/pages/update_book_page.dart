@@ -6,24 +6,31 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/Book.dart';
+import '../service/get_book_by_id.dart';
+import '../service/get_favorites.dart';
 import '../service/upload_image.dart';
 import 'home_page.dart';
 
-class AddBookPage extends StatefulWidget {
+class UpdateBookPage extends StatefulWidget {
+  final Book book;
+
+  UpdateBookPage({required this.book});
+
   @override
-  _AddBookPageState createState() => _AddBookPageState();
+  _UpdateBookPageState createState() => _UpdateBookPageState();
 }
 
-class _AddBookPageState extends State<AddBookPage> {
+class _UpdateBookPageState extends State<UpdateBookPage> {
   final _formKey = GlobalKey<FormState>();
-  String _bookName = '';
-  String _author = '';
-  String _advertisementDescription = '';
-  String _genre = 'Tarih';
-  String _bookState = 'Yeni';
+  late String _bookName;
+  late String _author;
+  late String _advertisementDescription;
+  late String _genre;
+  late String _bookState;
   File? _galleryFile;
   final _picker = ImagePicker();
-  bool _isSuspended = false;
+  late bool _isSuspended;
 
   final List<String> _genres = [
     'Tarih', 'Kurgu', 'Korku', 'Biyografi', 'Bilim Kurgu', 'Polisiye',
@@ -34,6 +41,19 @@ class _AddBookPageState extends State<AddBookPage> {
   final List<String> _bookStates = [
     'Yeni', 'Eski', 'Yıpranmış',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _bookName = widget.book.name;
+    _author = widget.book.author;
+    _advertisementDescription = widget.book.description;
+    _genre = widget.book.genre;
+    _bookState = widget.book.stateOfBook;
+    _isSuspended = widget.book.isAskida;
+  }
+
+
 
   void _showPicker(BuildContext context) {
     showModalBottomSheet(
@@ -72,13 +92,8 @@ class _AddBookPageState extends State<AddBookPage> {
     });
   }
 
-  Future<void> _addBook() async {
-    if (!_formKey.currentState!.validate() || _galleryFile == null) {
-      if (_galleryFile == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Lütfen kitap fotoğrafını yükleyin')),
-        );
-      }
+  Future<void> _updateBook() async {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
     _formKey.currentState!.save();
@@ -86,7 +101,7 @@ class _AddBookPageState extends State<AddBookPage> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('jwtoken');
 
-    final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Book');
+    final apiUrl = Uri.parse('https://bookcycle.azurewebsites.net/api/v1/Book/${widget.book.id}');
 
     String? base64Image;
     if (_galleryFile != null) {
@@ -94,26 +109,30 @@ class _AddBookPageState extends State<AddBookPage> {
     }
 
     try {
-      final response = await http.post(
+      final response = await http.put(
         apiUrl,
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: jsonEncode(<String, dynamic>{
+          'id': widget.book.id,
           'name': _bookName,
           'author': _author,
           'genre': _genre,
           'stateOfBook': _bookState,
           'description': _advertisementDescription,
           'isAskida': _isSuspended,
-          'bookImage': base64Image,
+          'bookImage': base64Image ?? widget.book.bookImage,
+          'location': widget.book.location,
+          'createdBy': widget.book.createdBy,
+          'created' : widget.book.created
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 204) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kitap başarıyla eklendi')),
+          const SnackBar(content: Text('Kitap başarıyla güncellendi')),
         );
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => HomePage()),
@@ -121,12 +140,12 @@ class _AddBookPageState extends State<AddBookPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Kitap ekleme başarısız: ${response.body}')),
+          SnackBar(content: Text('Kitap güncelleme başarısız: ${response.statusCode}, ${response.body}')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Kitap eklenirken hata oluştu: $e')),
+        SnackBar(content: Text('Kitap güncellenirken hata oluştu: $e')),
       );
     }
   }
@@ -135,7 +154,7 @@ class _AddBookPageState extends State<AddBookPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Kitap Ekle'),
+        title: Text('Kitap Güncelle'),
         backgroundColor: Colors.deepOrange.shade300,
       ),
       body: SingleChildScrollView(
@@ -149,39 +168,33 @@ class _AddBookPageState extends State<AddBookPage> {
               GestureDetector(
                 onTap: () => _showPicker(context),
                 child: Container(
-                  height: 250,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                    image: _galleryFile != null
-                        ? DecorationImage(
-                      image: FileImage(_galleryFile!),
+                  margin: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width / 4,
+                    right: MediaQuery.of(context).size.width / 4,
+                    bottom: 5,
+                    top: 5,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.horizontal(
+                      left: Radius.circular(8),
+                      right: Radius.circular(8),
+                    ),
+                    child: widget.book.bookImage != null && widget.book.bookImage!.isNotEmpty
+                        ? Image.memory(
+                      base64Decode(base64.normalize(widget.book.bookImage!)),
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset("images/book1.jpg", fit: BoxFit.cover);
+                      },
                     )
                         : null,
                   ),
-                  child: _galleryFile == null
-                      ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.photo_library,
-                        color: Colors.grey[600],
-                        size: 60,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Kitap fotoğrafı yükleyin',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
-                  )
-                      : null,
                 ),
               ),
               const SizedBox(height: 20),
               _buildTextField(
                 labelText: 'Kitap Adı',
+                initialValue: _bookName,
                 onSaved: (value) => _bookName = value!,
               ),
               const SizedBox(height: 20),
@@ -198,6 +211,7 @@ class _AddBookPageState extends State<AddBookPage> {
               const SizedBox(height: 20),
               _buildTextField(
                 labelText: 'Yazar',
+                initialValue: _author,
                 onSaved: (value) => _author = value!,
               ),
               const SizedBox(height: 20),
@@ -214,6 +228,7 @@ class _AddBookPageState extends State<AddBookPage> {
               const SizedBox(height: 20),
               _buildTextField(
                 labelText: 'İlanın Açıklaması',
+                initialValue: _advertisementDescription,
                 onSaved: (value) => _advertisementDescription = value!,
                 maxLines: 3,
               ),
@@ -231,8 +246,8 @@ class _AddBookPageState extends State<AddBookPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _addBook,
-                child: const Text('YÜKLE'),
+                onPressed: _updateBook,
+                child: const Text('GÜNCELLE'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepOrange.shade300,
                   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -255,9 +270,11 @@ class _AddBookPageState extends State<AddBookPage> {
   Widget _buildTextField({
     required String labelText,
     required FormFieldSetter<String> onSaved,
+    String? initialValue,
     int maxLines = 1,
   }) {
     return TextFormField(
+      initialValue: initialValue,
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: const TextStyle(color: Colors.black),

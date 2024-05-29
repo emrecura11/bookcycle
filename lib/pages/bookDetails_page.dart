@@ -1,11 +1,14 @@
 import 'dart:convert';
 
+import 'package:bookcycle/pages/update_book_page.dart';
+import 'package:bookcycle/service/delete_favorites.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/Book.dart';
 import '../models/User.dart';
 import '../service/add_favorite.dart';
+import '../service/get_favorites.dart';
 import '../service/get_user_by_id.dart';
 import '../widgets/book_report_widget.dart';
 import 'profile_page.dart';
@@ -26,9 +29,28 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   @override
   void initState() {
     super.initState();
-    _loadUserId().then((_) { // Ensure user ID is loaded
+    _loadUserId().then((_) {
+      // Ensure user ID is loaded
       setState(() {}); // Rebuild the widget once user ID is loaded
     });
+  }
+
+  Future<bool> isBookFavorite(int bookId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+
+    List<int> bookIds = [];
+    try {
+      List<int> favoriteBookIds = await getFavorites(userId!, bookIds);
+      for (int item in favoriteBookIds) {
+        if (item == bookId) {
+          return true;
+        }
+      }
+    } catch (error) {
+      print('Error fetching favorites: $error');
+    }
+    return false;
   }
 
   Future<void> _loadUserId() async {
@@ -39,7 +61,11 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   Future<void> onBookmarkPressed(BuildContext context) async {
     Book book = await widget.bookFuture;
     if (userId != null) {
-      addFavorite(context, userId!, book.id);
+      if (await isBookFavorite(book.id) == false) {
+        addFavorite(context, userId!, book.id);
+      } else {
+        deleteFavorite(userId!, book.id);
+      }
     }
   }
 
@@ -52,12 +78,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
         },
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("You need to be logged in to report an issue."))
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("You need to be logged in to report an issue.")));
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -94,37 +118,69 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 User user = userSnapshot.data!;
                 return Scaffold(
                   appBar: AppBar(
+                    backgroundColor: Colors.deepOrange.shade300,
                     leading: IconButton(
                       icon: Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                     actions: <Widget>[
                       if (userId != book.createdBy)
-                      IconButton(
-                        icon: Icon(Icons.favorite_border),
-                        color: Colors.black,
-                        onPressed: () {
-                          onBookmarkPressed(context);
-                        },
-                      ),
-                  if (userId != book.createdBy)
-                  IconButton(
-                  icon: Icon(Icons.report_problem, color: Colors.amber),
-                  onPressed: () => onReportPressed(context, book.id),
-                  ),
+                        IconButton(
+                          icon: FutureBuilder<bool>(
+                            future: isBookFavorite(book.id),
+                            builder: (context, isFavoriteSnapshot) {
+                              if (isFavoriteSnapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Icon(Icons.favorite_border,
+                                    color: Colors.black);
+                              } else {
+                                return Icon(
+                                  isFavoriteSnapshot.data == true
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: isFavoriteSnapshot.data == true
+                                      ? Colors.red
+                                      : Colors.black,
+                                );
+                              }
+                            },
+                          ),
+                          onPressed: () async {
+                            await onBookmarkPressed(context);
+                            setState(
+                                () {}); // Widget'ın yeniden çizilmesini sağlamak için setState kullanın
+                          },
+                        ),
+                      if (userId != book.createdBy)
+                        IconButton(
+                          icon: Icon(Icons.report_problem, color: Colors.amber),
+                          onPressed: () => onReportPressed(context, book.id),
+                        )
+                      else
+                        IconButton(
+                          icon: Icon(Icons.more_vert),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UpdateBookPage(
+                                  book: book,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                     ],
-                    backgroundColor: Colors.transparent,
                     elevation: 0,
                   ),
                   body: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        // Placeholder for image carousel
                         Container(
                           margin: EdgeInsets.only(
-                            left: MediaQuery.of(context).size.width / 3,
-                            right: MediaQuery.of(context).size.width / 3,
+                            left: MediaQuery.of(context).size.width / 4,
+                            right: MediaQuery.of(context).size.width / 4,
                             bottom: 5,
                             top: 5,
                           ),
@@ -133,15 +189,19 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                               left: Radius.circular(8),
                               right: Radius.circular(8),
                             ),
-                            child: book.bookImage != null && book.bookImage!.isNotEmpty
+                            child: book.bookImage != null &&
+                                    book.bookImage!.isNotEmpty
                                 ? Image.memory(
-                              base64Decode(base64.normalize(book.bookImage!)),
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Image.asset("images/book1.jpg", fit: BoxFit.cover);
-                              },
-                            )
-                                : Image.asset("images/book1.jpg", fit: BoxFit.cover),
+                                    base64Decode(
+                                        base64.normalize(book.bookImage!)),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.asset("images/book1.jpg",
+                                          fit: BoxFit.cover);
+                                    },
+                                  )
+                                : Image.asset("images/book1.jpg",
+                                    fit: BoxFit.cover),
                           ),
                         ),
                         const Padding(
@@ -162,7 +222,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                   Text(
                                     book.name,
                                     style: TextStyle(
-                                      fontSize: 24.0,
+                                      fontSize: 20.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -197,7 +257,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                   SizedBox(width: 4.0),
                                   Text(book.location),
                                   Spacer(),
-                                  Text("Tarih: ${book.created.substring(0,7)}"),
+                                  Text(
+                                      "Tarih: ${book.created.substring(0, 7)}"),
                                 ],
                               ),
                               SizedBox(height: 8.0),
@@ -214,7 +275,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text(
                                           'Yazar:',
@@ -230,7 +291,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text(
                                           'Durum:',
@@ -246,7 +307,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text(
                                           'Tür:',
@@ -272,9 +333,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                   padding: EdgeInsets.all(16.0),
                                   color: Colors.grey[200],
                                   width:
-                                  MediaQuery.of(context).size.width * 0.9,
-                                  height: MediaQuery.of(context).size.height *
-                                      0.2,
+                                      MediaQuery.of(context).size.width * 0.9,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.2,
                                   child: Text(
                                     book.description,
                                     overflow: TextOverflow.clip,
@@ -293,60 +354,28 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => ProfilePage(
-                                          userFuture: getUserInfo(
-                                              book.createdBy)),
+                                          userFuture:
+                                              getUserInfo(book.createdBy)),
                                     ),
                                   );
                                 },
                                 leading: CircleAvatar(
                                   radius: 20,
-                                  backgroundImage: AssetImage('images/logo_bookcycle.jpeg'),
+                                  backgroundImage: user.userImage != null
+                                      ? (user.userImage!.startsWith('http')
+                                          ? NetworkImage(user.userImage!)
+                                          : MemoryImage(
+                                                  base64Decode(user.userImage!))
+                                              as ImageProvider<
+                                                  Object>) // Base64 string
+                                      : const AssetImage(
+                                          'images/logo_bookcycle.jpeg'),
                                 ),
-                                  title: Text(user.userName),
-                                  trailing: Icon(Icons.arrow_forward),
+                                title: Text(user.userName),
+                                trailing: Icon(Icons.arrow_forward),
                               ),
-                              SizedBox(height: 5,),
-
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceEvenly,
-                                children: <Widget>[
-                                  TextButton(
-                                    style: TextButton.styleFrom(
-                                      backgroundColor:
-                                      Colors.deepOrange.shade300,
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 10.0, horizontal: 20.0),
-                                    ),
-                                    child: Text(
-                                      'İletişim Kur',
-                                      style: TextStyle(
-                                        fontSize: 11.0,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    onPressed: () {},
-                                  ),
-                                  TextButton(
-                                    style: TextButton.styleFrom(
-                                      backgroundColor:
-                                      Colors.deepOrange.shade300,
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 10.0, horizontal: 20.0),
-                                    ),
-                                    child: Text(
-                                      'İstek Listesi',
-                                      style: TextStyle(
-                                        fontSize: 11.0,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    onPressed: () {},
-                                  ),
-
-                                ],
+                              SizedBox(
+                                height: 5,
                               ),
                               const Divider(
                                 color: Colors.black,
