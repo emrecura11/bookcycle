@@ -11,37 +11,43 @@ class ForgotPassword extends StatelessWidget {
 
   TextEditingController emailController = TextEditingController();
   Future<void> sendResetPasswordRequest(BuildContext context) async {
-    final url = Uri.https('bookcycle.azurewebsites.net', '/api/Account/forgot-password');
-
-    print("Making request to URL: $url");
+    final url = Uri.parse('https://bookcycle.azurewebsites.net/api/Account/forgot-password');
 
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', 'origin': 'https://bookcycle.azurewebsites.net'},
         body: jsonEncode({'email': emailController.text}),
       );
 
-      print("URL: $url");
-      print("URI Scheme: ${url.scheme}");
-      print("URI Host: ${url.host}");
-      print("URI Path: ${url.path}");
-
-      print("Headers: {'Content-Type': 'application/json'}");
-      print("Body: ${jsonEncode({'email': emailController.text})}");
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // İşlem başarılı
-        print("Password reset email sent successfully.");
+        // İşlem başarılı, VerificationCode sayfasına yönlendir
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerificationCode(email: emailController.text),
+          ),
+        );
       } else {
-        // Sunucu hata mesajı döndürdü
+        // Sunucu hata mesajı döndürdü, kullanıcıya uyarı göster
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Şifre sıfırlama isteği başarısız oldu. Lütfen tekrar deneyin."),
+            backgroundColor: Colors.red,
+          ),
+        );
         print("Failed to send password reset email. Status code: ${response.statusCode}");
         print("Error response body: ${response.body}");
       }
     } catch (e) {
-      // HTTP isteği sırasında bir hata oluştu
+      // HTTP isteği sırasında bir hata oluştu, kullanıcıya uyarı göster
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Bir hata oluştu. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin."),
+          backgroundColor: Colors.red,
+        ),
+      );
       print("An error occurred while sending password reset email: $e");
     }
   }
