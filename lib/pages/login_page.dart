@@ -1,3 +1,4 @@
+import 'package:bookcycle/pages/forgot_Password.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
@@ -228,9 +229,19 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: height * 0.02),
                       FadeInUp(
                         duration: Duration(milliseconds: 1500),
-                        child: Text(
-                          "Şifremi unuttum",
-                          style: TextStyle(color: Colors.grey),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ForgotPassword()),
+                            );
+                          },
+                          child: Text(
+                            "Şifremi unuttum!",
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                       SizedBox(height: height * 0.02),
