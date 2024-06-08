@@ -159,7 +159,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             : MemoryImage(
                             base64Decode(user.userImage!)) as ImageProvider<
                             Object>) // Base64 string
-                            : const AssetImage('images/logo_bookcycle.jpeg'),
+                            : const AssetImage('images/default.jpg'),
                       ),
                     ),
                   ),

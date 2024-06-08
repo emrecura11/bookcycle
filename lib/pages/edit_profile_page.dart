@@ -16,6 +16,8 @@ import '../models/User.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:csc_picker/csc_picker.dart';
+
 class EditProfile extends StatefulWidget {
   @override
   _EditProfileState createState() => _EditProfileState();
@@ -32,7 +34,9 @@ class _EditProfileState extends State<EditProfile> {
   String? selectedProvince;
   String? selectedDistrict;
   final String baseUrl = 'https://bookcycle.azurewebsites.net/api/Account';
-
+  String? countryValue = "";
+  String? stateValue = "";
+  String? cityValue = "";
   @override
   void initState() {
     super.initState();
@@ -79,11 +83,11 @@ class _EditProfileState extends State<EditProfile> {
     } else {
       uploadedImageBase64 = user.userImage;  // Use existing user image
     }
-    if (selectedProvince != null && selectedDistrict != null) {
-      formattedLocation = '$selectedDistrict/$selectedProvince';
+    if (stateValue != null && cityValue != null) {
+      formattedLocation = '$cityValue/$stateValue';
     }
-    else if (selectedProvince != null && selectedDistrict == null) {
-      formattedLocation = '$selectedProvince';
+    else if (stateValue != null && cityValue == null) {
+      formattedLocation = '$stateValue';
     }
     bool success = await updateService.updateUser(
       userId: user.id,
@@ -112,7 +116,7 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
   Future<String> getDefaultImageBase64() async {
-    final ByteData data = await rootBundle.load('images/logo_bookcycle.jpeg');
+    final ByteData data = await rootBundle.load('images/default.jpg');
     final Uint8List bytes = data.buffer.asUint8List();
     return base64Encode(bytes);
   }
@@ -173,11 +177,12 @@ class _EditProfileState extends State<EditProfile> {
           : MemoryImage(base64Decode(user.userImage!)) as ImageProvider<Object>;
     } else {
       // Hiçbir kaynak yoksa varsayılan resmi göster
-      return const AssetImage('images/logo_bookcycle.jpeg');
+      return const AssetImage('images/default.jpg');
     }
   }
   @override
   Widget build(BuildContext context) {
+    GlobalKey<CSCPickerState> _cscPickerKey = GlobalKey();
     return Scaffold(
       appBar: AppBar(
         title: Text('Profil Düzenleme'),
@@ -235,63 +240,57 @@ class _EditProfileState extends State<EditProfile> {
                 maxLines: null,
               ),
               const SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'İl Seçiniz',
-                  border: OutlineInputBorder(),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF88C4A8), width: 2),
-                  ),
-                ),
-                value: selectedProvince,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedProvince = newValue!;
-                    currentDistricts = districts[selectedProvince]!;
-                    selectedDistrict = null; // Reset district when province changes
-                  });
+              ///Adding CSC Picker Widget in app
+              CSCPicker(
+                layout: Layout.vertical,
+                flagState: CountryFlag.ENABLE,
+                onCountryChanged: (country){
+                  print(country);
                 },
-                items: provinces.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 20),
-              // District dropdown
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'İlçe Seçiniz',
-                  border: OutlineInputBorder(),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF88C4A8), width: 2),
-                  ),
-                ),
-                value: selectedDistrict,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedDistrict = newValue!;
-                  });
+                onStateChanged: (state){
+                  print(state);
+                  stateValue=state;
                 },
-                items: currentDistricts.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
+                onCityChanged: (city){
+                  cityValue=city;
+                },
+                defaultCountry: CscCountry.Turkey, // Set default country to Turkey
+                disableCountry: true,
+                stateSearchPlaceholder: "İl",
+                citySearchPlaceholder: "İlçe",
+
+                stateDropdownLabel: "İl seçin",
+                cityDropdownLabel: "İlçe seçin",
+                dropdownDialogRadius: 12.0,
+                searchBarRadius: 30.0,
+                dropdownDecoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: Colors.white,
+                    border:
+                    Border.all(color: Colors.grey.shade800, width: 2)),
+
+                disabledDropdownDecoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: Colors.grey.shade300,
+                    border:
+                    Border.all(color: Colors.grey.shade600, width: 2)),
+                ///selected item style [OPTIONAL PARAMETER]
+                selectedItemStyle: TextStyle(
+                  color: Colors.grey.shade800,
+                  fontSize: 14,
+                ),
+
+                ///DropdownDialog Heading style [OPTIONAL PARAMETER]
+                dropdownHeadingStyle: TextStyle(
+                    color: Colors.grey.shade900,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold),
+
+                ///DropdownDialog Item style [OPTIONAL PARAMETER]
+                dropdownItemStyle: TextStyle(
+                  color: Colors.grey.shade800,
+                  fontSize: 14,
+                ),
               ),
               const SizedBox(height: 20),
               _isUploading
