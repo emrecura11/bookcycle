@@ -337,7 +337,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                         : null;
 
                     Future<List<Book>> list = getFilteredBooks(
-                        selectedGenresList(), _isSuspended, startDate, endDate);
+                        selectedGenresList(), _isSuspended, startDate, endDate,selectedCity,selectedState);
 
                     Navigator.push(
                       context,

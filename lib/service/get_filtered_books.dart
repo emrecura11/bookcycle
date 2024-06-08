@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/Book.dart';
 
-Future<List<Book>> getFilteredBooks(List<String> genres, bool? isAskida, String? startDate, String? endDate) async {
+Future<List<Book>> getFilteredBooks(List<String> genres, bool? isAskida, String? startDate, String? endDate, String? location, String? state) async {
   final queryParams = {
     'genres': genres.isNotEmpty ? genres.join(',') : null,
     'isAskida': isAskida?.toString() ?? null,
     'startDate': startDate,
     'endDate': endDate,
+    'location': location,
+    'state': state
   };
 
   final filteredParams = queryParams..removeWhere((key, value) => value == null);

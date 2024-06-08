@@ -31,7 +31,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
     super.initState();
     _loadUserId().then((_) {
       // Ensure user ID is loaded
-      setState(() {}); // Rebuild the widget once user ID is loaded
+      setState(() {});
     });
   }
 
@@ -97,7 +97,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
             width: 50.0,
           ); // Placeholder for loading state
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return Text('Kitap bulunamadı lütfen tekrar deneyiniz');
         } else {
           Book book = snapshot.data!;
           _userFuture = getUserInfo(book.createdBy);
