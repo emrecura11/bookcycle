@@ -222,12 +222,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(
-                                  Icons.messenger,
-                                  color: Color(0xFF88C4A8),
-                                ),
-                                BasicButton(
-                                  onTap: () {
+
+                                TextButton(
+                                  onPressed: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -237,8 +234,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ),
                                       ),
                                     );
-                                  },
-                                  buttonText: "Mesaj",
+                                  }, child: Text("Mesaj"),
                                 ),
                                 IconButton(
                                   icon: Icon(Icons.report_problem,
@@ -344,8 +340,12 @@ class _ProfilePageState extends State<ProfilePage> {
               child: CircularProgressIndicator(),
             );
           }),
-      bottomNavigationBar: BottomNavBar(
-        selectedIndex: 4,
+
+      bottomNavigationBar: Visibility(
+        visible: _userIsCurrent,
+        child: BottomNavBar(
+          selectedIndex: 4,
+        ),
       ),
     );
   }

@@ -36,7 +36,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return BottomAppBar(
       color: Colors.white,
       child: Container(
-        height: kToolbarHeight + 5,
+        height: kToolbarHeight,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
