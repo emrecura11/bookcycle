@@ -23,6 +23,7 @@ class _ChatPageState extends State<ChatPage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _textEditingController = TextEditingController();
   bool _isConnected = false;
+  bool _isLoading = true;
   User user = User(id: "", email: "", userName: "");
 
   @override
@@ -54,6 +55,9 @@ class _ChatPageState extends State<ChatPage> {
 
   void getUser() async{
     user = await getUserInfo(widget.receiverId);
+    setState(() {
+      _isLoading = false; // Set loading to false after user data is fetched
+    });
   }
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
@@ -134,9 +138,23 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(user.userName),
+        title: Row(
+          children: [
+            CircleAvatar(
+              backgroundImage: user.userImage != null
+                  ? (user.userImage!.startsWith('http')
+                  ? NetworkImage(user.userImage!)
+                  : MemoryImage(base64Decode(user.userImage!)) as ImageProvider<Object>)
+                  : const AssetImage('images/default.jpg'),
+            ),
+            Container(
+                padding: const EdgeInsets.all(8.0), child: Text(user.userName)),
+          ],
+        ),
       ),
-      body: Column(
+      body: _isLoading // Check if still loading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
         children: [
           Expanded(
             child: ListView.builder(

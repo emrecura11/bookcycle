@@ -170,7 +170,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             as ImageProvider<
                                                 Object>) // Base64 string
                                     : const AssetImage(
-                                        'images/logo_bookcycle.jpeg'),
+                                        'images/default.jpg'),
                               ),
                             ),
                           ),

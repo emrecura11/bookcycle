@@ -69,7 +69,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
                           ? (user.userImage!.startsWith('http')
                           ? NetworkImage(user.userImage!)
                           : MemoryImage(base64Decode(user.userImage!)) as ImageProvider<Object>)
-                          : const AssetImage('images/logo_bookcycle.jpeg'),
+                          : const AssetImage('images/default.jpg'),
                       radius: 50,
                     ),
                     const SizedBox(width: 20),
