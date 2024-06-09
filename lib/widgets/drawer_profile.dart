@@ -54,7 +54,9 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
             future: userFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
               } else if (snapshot.hasError) {
                 return Text("Error: ${snapshot.error}");
               } else if (snapshot.hasData) {
@@ -192,7 +194,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
               ),
               ListTile(
                 leading: Icon(
-                  Icons.location_on,
+                  Icons.delete_forever,
                   color: Colors.deepOrange.shade300,
                 ),
                 title: Text('Hesabı Sil'),

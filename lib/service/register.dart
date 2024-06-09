@@ -19,7 +19,7 @@ Future<void> signUpUser(BuildContext context, String username, String email,
       http.Response response = await http.post(
         Uri.parse(apiUrl),
         body: json.encode(requestBody),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', 'origin': 'https://bookcycle.azurewebsites.net/'},
       );
 
       if (response.statusCode == 200) {
@@ -28,7 +28,7 @@ Future<void> signUpUser(BuildContext context, String username, String email,
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              content: Text("Registration is succeeded"),
+              content: Text("Kayıt Başarılı"),
               actions: [
                 ElevatedButton(
                   child: Text("OK"),
@@ -41,11 +41,12 @@ Future<void> signUpUser(BuildContext context, String username, String email,
           },
         );
       } else {
+        print(response.body);
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              content: Text("Registration is failed!"),
+              content: Text("Hata! Kayıt başarısız!"),
               actions: [
                 ElevatedButton(
                   child: Text("OK"),

@@ -61,7 +61,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.deepOrange.shade300,
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -69,10 +69,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 50),
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Icon(Icons.arrow_back, size: 24.0),
-              ),
+
               Padding(
                 padding: EdgeInsets.only(left: 8.0),
                 child: Align(
@@ -80,9 +77,24 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   child: Text(
                     "Favorilerim",
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10,),
+              Padding(
+                padding: EdgeInsets.only(left: 8.0),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "${books.length} tane sonuç bulundu.",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+
                     ),
                   ),
                 ),
@@ -103,7 +115,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       future: getUserInfo(books[index].createdBy),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator();
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
                         } else if (snapshot.hasError) {
                           return Text('Error: ${snapshot.error}');
                         } else {
@@ -120,112 +134,138 @@ class _FavoritesPageState extends State<FavoritesPage> {
                               );
                             },
                             child: Card(
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 10),
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
+                              color: Colors.white,
                               child: Container(
                                 decoration: BoxDecoration(
-                                  gradient: gradient,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: IntrinsicHeight(
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Container(
-                                          margin: EdgeInsets.all(8.0),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.horizontal(
-                                              left: Radius.circular(8),
-                                              right: Radius.circular(8),
-                                            ),
-                                            child: books[index].bookImage != null &&
-                                                books[index].bookImage!.isNotEmpty
-                                                ? Image.memory(
-                                              base64Decode(base64.normalize(
-                                                  books[index].bookImage!)),
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error,
-                                                  stackTrace) {
-                                                return Image.asset(
-                                                    "images/book1.jpg",
-                                                    fit: BoxFit.cover);
-                                              },
-                                            )
-                                                : Image.asset(
-                                              "images/book1.jpg",
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        flex: 1,
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: EdgeInsets.all(10),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                            children: <Widget>[
-                                              Row(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    books[index].name,
-                                                    style: const TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      if (books[index].isAskida)
-                                                        Icon(
-                                                          Icons.volunteer_activism,
-                                                          color: Color(0xFF76C893),
-                                                        )
-                                                      else
-                                                        Icon(
-                                                          Icons.volunteer_activism_outlined,
-                                                          color: Color(0xFF76C893),
-                                                        ),
-                                                      IconButton(
-                                                        onPressed: () {
-                                                          deleteFavorite(currentUser.id,books[index].id).then((_) {
-                                                            setState(() {
-                                                              books.removeAt(index);
-                                                            });
-                                                          });                                                          },
-                                                        icon: Icon(Icons.delete),
-                                                        color: Colors.black,
-                                                      ),
-                                                    ],
-                                                  )
-                                                ],
+                                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+
+                                          Row(
+                                            children: [
+                                              CircleAvatar(
+                                                radius: 20,
+                                                backgroundImage: user.userImage != null
+                                                    ? (user.userImage!.startsWith('http')
+                                                    ? NetworkImage(user.userImage!)
+                                                    : MemoryImage(
+                                                    base64Decode(user.userImage!))
+                                                as ImageProvider<
+                                                    Object>) // Base64 string
+                                                    : const AssetImage(
+                                                    'images/logo_bookcycle.jpeg'),
                                               ),
-                                              Text("Yazar: ${books[index].author}"),
-                                              Text("Kategori: ${books[index].genre}"),
-                                              Row(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text("Kullanıcı: ${user.userName}"),
-                                                  Text("Tarih: ${books[index].created.substring(0,7)}"),
-                                                ],
+                                              SizedBox(width: 5,),
+                                              Text(
+                                                user.userName,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ],
                                           ),
-                                        ),
-                                        flex: 3,
+                                          Row(
+                                            children: [
+                                              if (books[index].isAskida)
+                                                Icon(
+                                                  Icons.volunteer_activism,
+                                                  color: Color(0xFF76C893),
+                                                )
+                                              else
+                                                Icon(
+                                                  Icons.volunteer_activism_outlined,
+                                                  color: Color(0xFF76C893),
+                                                ),
+                                              IconButton(
+                                                onPressed: () {
+                                                  deleteFavorite(user.id, books[index].id).then((_) {
+                                                    setState(() {
+                                                      books.removeAt(index);
+                                                    });
+                                                  });                                                          },
+                                                icon: Icon(Icons.delete),
+                                                color: Colors.grey,
+                                              ),
+                                            ],
+                                          )
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      child: books[index].bookImage != null &&
+                                          books[index].bookImage!.isNotEmpty
+                                          ? Image.memory(
+                                        base64Decode(
+                                            base64.normalize(books[index].bookImage!)),
+                                        fit: BoxFit.cover,
+                                        width: MediaQuery.of(context).size.width,
+                                        height: 200,
+                                        errorBuilder: (context, error,
+                                            stackTrace) {
+                                          return Image.asset(
+                                              "images/book1.jpg",
+                                              fit: BoxFit.cover);
+                                        },
+                                      )
+                                          : Image.asset(
+                                        "images/book1.jpg",
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    SizedBox(height: 10,),
+                                    Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+
+                                          Text("${books[index].name}",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          SizedBox(height: 10,),
+                                          if(books[index].description.length<45)
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.comment_bank_outlined,
+                                                  size: 20,
+                                                  color: Colors.grey,
+                                                ),
+                                                SizedBox(width: 5,),
+                                                Text("${books[index].description}"),
+                                              ],
+                                            )
+                                          else
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.comment_bank_outlined,
+                                                  size: 20,
+                                                  color: Colors.grey,
+                                                ),
+                                                SizedBox(width: 5,),
+                                                Text("${books[index].description.substring(0,45)}..."),
+                                              ],
+                                            )
+
+
+
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

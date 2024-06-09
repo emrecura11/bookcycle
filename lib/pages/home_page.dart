@@ -1,8 +1,7 @@
-
 import 'package:bookcycle/pages/fileter_results_page.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'dart:convert';
-
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,8 +45,9 @@ class _HomePageState extends State<HomePage> {
       print('Error fetching books: $e');
     }
   }
+
   final List<List<Color>> colorPairs = [
-    [Colors.white, Colors.white],
+    [Colors.deepOrange.shade300, Colors.deepOrange.shade300],
   ];
 
   void _showFilterDialog(BuildContext context) {
@@ -111,9 +111,8 @@ class _HomePageState extends State<HomePage> {
           Column(
             children: [
               Text(
-                'bookcycle',
-                style: TextStyle(
-                    fontSize: 24, fontWeight: FontWeight.bold),
+                'Bookcycle',
+                style: TextStyle(fontFamily:'LexendExa', fontSize: 28, fontWeight: FontWeight.bold),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -149,8 +148,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           onPressed: () {
                             _showFilterDialog(context);
-                          }
-                      ),
+                          }),
                     ],
                   ),
                 ),
@@ -188,7 +186,9 @@ class _HomePageState extends State<HomePage> {
                   future: getUserInfo(book.createdBy),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
@@ -204,109 +204,126 @@ class _HomePageState extends State<HomePage> {
                             ),
                           );
                         },
+
                         child: Card(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: BorderSide(color: Colors.black, width: 1)),
+                          color: Colors.white,
                           child: Container(
                             decoration: BoxDecoration(
-                              gradient: gradient,
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: IntrinsicHeight(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Container(
-                                      margin: EdgeInsets.all(8.0),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.horizontal(
+                            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
 
-                                          left: Radius.circular(8),
-                                          right: Radius.circular(8),
-                                        ),
-                                        child: book.bookImage != null &&
-                                            book.bookImage!.isNotEmpty
-                                            ? Image.memory(
-                                          base64Decode(base64.normalize(
-                                              book.bookImage!)),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error,
-                                              stackTrace) {
-                                            return Image.asset(
-                                                "images/book1.jpg",
-                                                fit: BoxFit.cover);
-                                          },
-
-                                        )
-                                            : Image.asset(
-                                          "images/book1.jpg",
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    flex: 1,
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                        children: <Widget>[
-                                          Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                book.name,
-                                                style: const TextStyle(
-                                                  fontWeight:
-                                                  FontWeight.bold,
-                                                ),
-                                                overflow:
-                                                TextOverflow.ellipsis,
-                                              ),
-                                              if (book.isAskida)
-                                                Icon(
-                                                  Icons
-                                                      .volunteer_activism,
-                                                  color: Color(0xFF76C893),
-                                                )
-                                              else
-                                                Icon(
-                                                  Icons
-                                                      .volunteer_activism_outlined,
-                                                  color: Color(0xFF76C893),
-                                                )
-                                            ],
+                                      Row(
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 20,
+                                            backgroundImage: user.userImage != null
+                                                ? (user.userImage!.startsWith('http')
+                                                ? NetworkImage(user.userImage!)
+                                                : MemoryImage(
+                                                base64Decode(user.userImage!))
+                                            as ImageProvider<
+                                                Object>) // Base64 string
+                                                : const AssetImage(
+                                                'images/logo_bookcycle.jpeg'),
                                           ),
-                                          Text("Yazar: ${book.author}"),
-                                          Text("Kategori: ${book.genre}"),
-                                          Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment
-                                                .spaceBetween,
-                                            children: [
-                                              Text(
-                                                  "Kullanıcı: ${user.userName}"),
-                                              Text(
-                                                  "Tarih: ${book.created.substring(0, 7)}"),
-                                            ],
+                                          SizedBox(width: 5,),
+                                          Text(
+                                            user.userName,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    flex: 3,
+                                      if (book.isAskida)
+                                        Icon(
+                                          Icons.volunteer_activism,
+                                          color: Color(0xFF76C893),
+                                        )
+                                      else
+                                        Icon(
+                                          Icons.volunteer_activism_outlined,
+                                          color: Color(0xFF76C893),
+                                        )
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  child: book.bookImage != null &&
+                                      book.bookImage!.isNotEmpty
+                                      ? Image.memory(
+                                    base64Decode(
+                                        base64.normalize(book.bookImage!)),
+                                    fit: BoxFit.cover,
+                                    width: MediaQuery.of(context).size.width,
+                                    height: 200,
+                                    errorBuilder: (context, error,
+                                        stackTrace) {
+                                      return Image.asset(
+                                          "images/book1.jpg",
+                                          fit: BoxFit.cover);
+                                    },
+                                  )
+                                      : Image.asset(
+                                    "images/book1.jpg",
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                SizedBox(height: 10,),
+                                Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+
+                                          Text("${book.name}",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                      SizedBox(height: 10,),
+                                      if(book.description.length<45)
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.comment_bank_outlined,
+                                              size: 20,
+                                              color: Colors.grey,
+                                            ),
+                                            SizedBox(width: 5,),
+                                            Text("${book.description}"),
+                                          ],
+                                        )
+                                      else
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.comment_bank_outlined,
+                                              size: 20,
+                                              color: Colors.grey,
+                                            ),
+                                            SizedBox(width: 5,),
+                                            Text("${book.description.substring(0,45)}..."),
+                                          ],
+                                        )
+
+
+
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -351,7 +368,7 @@ Widget headerTopCategories(BuildContext context) {
           children: <Widget>[
             headerCategoryItem('Tarih', Icons.history_rounded, onPressed: () {
               List<String> listTarih = ["Tarih"];
-              Future<List<Book>> list = getFilteredBooks(listTarih, null, null, null);
+              Future<List<Book>> list = getFilteredBooks(listTarih, null, null, null, null, null);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -361,7 +378,7 @@ Widget headerTopCategories(BuildContext context) {
             }),
             headerCategoryItem('Şiir', Icons.history_edu, onPressed: () {
               List<String> listTarih = ["Şiir"];
-              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null, null, null);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -371,7 +388,7 @@ Widget headerTopCategories(BuildContext context) {
             }),
             headerCategoryItem('Kurgu', Icons.movie, onPressed: () {
               List<String> listTarih = ["Kurgu"];
-              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null, null, null);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -381,7 +398,7 @@ Widget headerTopCategories(BuildContext context) {
             }),
             headerCategoryItem('Eğitim', Icons.book, onPressed: () {
               List<String> listTarih = ["Eğitim"];
-              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null, null, null);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -391,7 +408,7 @@ Widget headerTopCategories(BuildContext context) {
             }),
             headerCategoryItem('Biyografi', Icons.account_circle, onPressed: () {
               List<String> listTarih = ["Biyografi"];
-              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null, null, null);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -401,7 +418,7 @@ Widget headerTopCategories(BuildContext context) {
             }),
             headerCategoryItem('Bilim Kurgu', Icons.science_rounded, onPressed: () {
               List<String> listTarih = ["Bilim Kurgu"];
-              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null, null, null);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -411,7 +428,7 @@ Widget headerTopCategories(BuildContext context) {
             }),
             headerCategoryItem('Polisiye', Icons.policy_rounded, onPressed: () {
               List<String> listTarih = ["Polisiye"];
-              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null, null, null);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -421,7 +438,7 @@ Widget headerTopCategories(BuildContext context) {
             }),
             headerCategoryItem('Felsefe-Dini', Icons.mosque_rounded, onPressed: () {
               List<String> listTarih = ["Felsefe-Dini"];
-              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null, null, null);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -429,9 +446,9 @@ Widget headerTopCategories(BuildContext context) {
                 ),
               );
             }),
-            headerCategoryItem('Bilim-Teknoloji', Icons.computer_rounded , onPressed: () {
+            headerCategoryItem('Bilim-Teknoloji', Icons.computer_rounded, onPressed: () {
               List<String> listTarih = ["Bilim-Teknoloji"];
-              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null);
+              Future<List<Book>> list = getFilteredBooks(listTarih, true, null, null, null, null);
               Navigator.push(
                 context,
                 MaterialPageRoute(
