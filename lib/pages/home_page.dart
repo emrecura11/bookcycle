@@ -35,10 +35,10 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _fetchBooks() async {
     try {
-      final List<Book> fetchedBooks = await getAllBooks();
+      List<Book> fetchedBooks = await getAllBooks();
       setState(() {
-        _books = fetchedBooks;
-        _filteredBooks = fetchedBooks;
+        _books = fetchedBooks.reversed.toList();
+        _filteredBooks = fetchedBooks.reversed.toList();
       });
     } catch (e) {
       // Handle error

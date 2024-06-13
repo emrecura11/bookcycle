@@ -19,7 +19,7 @@ Future<void> deleteFavorite(String userId, int bookId) async {
     if (response.statusCode == 200) {
       print('Favorite deleted successfully');
     } else {
-      print('Failed to delete favorite. Error: ${response.statusCode}');
+      print('Failed to delete favorite. Error: ${response.statusCode}  ${response.body}');
     }
   } catch (e) {
     print('Failed to delete favorite. Error: $e');

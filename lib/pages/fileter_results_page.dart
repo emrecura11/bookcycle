@@ -30,18 +30,17 @@ class _FilterResultsPageState extends State<FilterResultsPage> {
     try {
       // Fetch books using the provided Future and log the result
       List<Book> fetchedBooks = await widget.books2;
-      print('Fetched books: $fetchedBooks');
+
 
       setState(() {
         books = fetchedBooks;
         isLoading = false;
       });
 
-      // Log the number of books fetched for debugging purposes
-      print('Number of books fetched: ${books.length}');
+
     } catch (e) {
       // Log any errors that occur and set the loading state to false
-      print('Error fetching books: $e');
+
       setState(() {
         isLoading = false;
       });
@@ -51,7 +50,7 @@ class _FilterResultsPageState extends State<FilterResultsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.deepOrange.shade300,
       body: SingleChildScrollView(
         child: Center(
           child: Column(

@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../service/upload_image.dart';
+import '../widgets/bottomnavbar.dart';
 import 'home_page.dart';
 
 class AddBookPage extends StatefulWidget {
@@ -258,6 +259,7 @@ class _AddBookPageState extends State<AddBookPage> {
           ),
         ),
       ),
+      bottomNavigationBar: BottomNavBar(selectedIndex: 2),
     );
   }
 

@@ -21,6 +21,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   final List<int> bookIds = [];
   final List<Book> books = [];
+  String userId= "";
   User currentUser = User(id: "", email: "", userName: "");
   @override
   void didChangeDependencies() {
@@ -31,7 +32,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   Future<void> _loadFavorites() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId');
+    userId = (prefs.getString('userId'))!;
 
     currentUser = await getUserInfo(userId!);
 
@@ -187,7 +188,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                                 ),
                                               IconButton(
                                                 onPressed: () {
-                                                  deleteFavorite(user.id, books[index].id).then((_) {
+                                                  deleteFavorite(userId, books[index].id).then((_) {
                                                     setState(() {
                                                       books.removeAt(index);
                                                     });

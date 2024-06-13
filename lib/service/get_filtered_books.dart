@@ -4,7 +4,7 @@ import '../models/Book.dart';
 
 Future<List<Book>> getFilteredBooks(List<String> genres, bool? isAskida, String? startDate, String? endDate, String? location, String? state) async {
   final queryParams = {
-    'genres': genres.isNotEmpty ? genres.join(',') : null,
+    'genres': genres.isNotEmpty ? genres : null,
     'isAskida': isAskida?.toString() ?? null,
     'startDate': startDate,
     'endDate': endDate,
@@ -24,9 +24,6 @@ Future<List<Book>> getFilteredBooks(List<String> genres, bool? isAskida, String?
 
     final response = await http.get(uri, headers: {'accept': '*/*'});
 
-    // Log the response status and body for debugging
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);

@@ -38,7 +38,7 @@ class _ChatPageState extends State<ChatPage> {
       setState(() {
         _isConnected = false;
       });
-      print("Connection closed: $error");
+
     });
 
     _startListening();
@@ -80,7 +80,6 @@ class _ChatPageState extends State<ChatPage> {
 
   void handleMessage(List<dynamic>? arguments) {
     if (arguments == null || arguments.isEmpty) {
-      print('No messages found.');
       return;
     }
     var nestedList = arguments.first;
@@ -91,7 +90,7 @@ class _ChatPageState extends State<ChatPage> {
           try {
             newMessages.add(Message.fromJson(Map<String, dynamic>.from(json)));
           } catch (e) {
-            print('Error processing message: $e');
+
           }
         } else {
           print('Invalid format: Expected Map<String, dynamic>, got ${json.runtimeType}');
@@ -140,13 +139,7 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            CircleAvatar(
-              backgroundImage: user.userImage != null
-                  ? (user.userImage!.startsWith('http')
-                  ? NetworkImage(user.userImage!)
-                  : MemoryImage(base64Decode(user.userImage!)) as ImageProvider<Object>)
-                  : const AssetImage('images/default.jpg'),
-            ),
+
             Container(
                 padding: const EdgeInsets.all(8.0), child: Text(user.userName)),
           ],

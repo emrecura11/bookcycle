@@ -18,7 +18,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  bool rememberMe = false;
+
 
   // Login user method
   Future<bool> loginUser(BuildContext context) async {
@@ -204,21 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                                       inputType: TextInputType.visiblePassword,
                                       prefixIcon: Icon(Icons.vpn_key),
                                     ),
-                                    SizedBox(height: height * 0.001),
-                                    Row(
-                                      children: <Widget>[
-                                        Spacer(),
-                                        Checkbox(
-                                          value: rememberMe,
-                                          onChanged: (bool? value) {
-                                            setState(() {
-                                              rememberMe = value!;
-                                            });
-                                          },
-                                        ),
-                                        Text('Beni Hatırla'),
-                                      ],
-                                    ),
+
                                   ],
                                 ),
                               ),

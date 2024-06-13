@@ -140,6 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          SizedBox(height: 20,),
                           Visibility(
                             visible: _userIsCurrent,
                             child: Padding(
@@ -219,35 +220,44 @@ class _ProfilePageState extends State<ProfilePage> {
                           const SizedBox(height: 10),
                           Visibility(
                             visible: !_userIsCurrent,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
+                            child: SizedBox(
+                              height: 35,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
 
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ChatPage(
-                                          senderId: userId,
-                                          receiverId: user.id,
-                                        ),
-                                      ),
-                                    );
-                                  }, child: Text("Mesaj"),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.report_problem,
-                                      color: Colors.amber),
-                                  onPressed: () =>
-                                      onReportPressed(context, user.id),
-                                ),
-                              ],
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.deepOrange.shade300,
+                                      borderRadius: BorderRadius.all(Radius.circular(8)),
+
+                                    ),
+                                    child: TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ChatPage(
+                                              senderId: userId,
+                                              receiverId: user.id,
+                                            ),
+                                          ),
+                                        );
+                                      }, child: Text("Mesaj" , style: TextStyle(color: Colors.grey.shade300),),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.report_problem,
+                                        color: Colors.amber),
+                                    onPressed: () =>
+                                        onReportPressed(context, user.id),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           const SizedBox(height: 10),
-                          
-                          
+
                           Container(
                             decoration:  BoxDecoration(
                               borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
@@ -419,29 +429,36 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      Row(
-                                        children: [
-                                          IconButton(
-                                            onPressed: () {
-                                              deleteWishlist(
-                                                      wishlist2[index].id)
-                                                  .then((_) {
-                                                setState(() {
-                                                  wishlist2.removeAt(index);
+                                      Visibility(
+                                        visible: _userIsCurrent,
+                                        child: Row(
+                                          children: [
+                                            IconButton(
+                                              onPressed: () {
+                                                deleteWishlist(
+                                                        wishlist2[index].id)
+                                                    .then((_) {
+                                                  setState(() {
+                                                    wishlist2.removeAt(index);
+                                                  });
                                                 });
-                                              });
-                                            },
-                                            icon: Icon(Icons.delete),
-                                            color: Colors.grey,
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              _showUpdateWishlistDialog(context, wishlist2[index]);
-                                            },
-                                            icon: Icon(Icons.more_vert_outlined),
-                                            color: Colors.black,
-                                          ),
-                                        ],
+                                              },
+                                              icon: Icon(Icons.delete),
+                                              color: Colors.grey,
+                                            ),
+                                            IconButton(
+                                              onPressed: () {
+                                                _showUpdateWishlistDialog(context, wishlist2[index]).then((value) =>
+                                                setState(() {
+                                                  fetchWishlists();
+                                                })
+                                                );
+                                              },
+                                              icon: Icon(Icons.more_vert_outlined),
+                                              color: Colors.black,
+                                            ),
+                                          ],
+                                        ),
                                       )
                                     ],
                                   ),
@@ -640,7 +657,7 @@ class _ProfilePageState extends State<ProfilePage> {
           'Authorization': 'Bearer $token'
         });
 
-    print(response.statusCode);
+
 
     if (response.statusCode == 200) {
       setState(() {
@@ -671,7 +688,7 @@ class _ProfilePageState extends State<ProfilePage> {
         'description': description,
       }),
     );
-    print(response.statusCode);
+
 
     if (response.statusCode == 201) {
       fetchWishlists(); // Yeni bir wishlist ekledikten sonra listeyi güncelle
@@ -783,7 +800,7 @@ class _ProfilePageState extends State<ProfilePage> {
               TextField(
                 controller: authorController,
                 decoration: InputDecoration(
-                    labelText: 'Yazar', hintText: wishlist.author),
+                    labelText: 'Yazar', hintText: wishlist.author,),
               ),
               TextField(
                 controller: stateOfBookController,
@@ -823,7 +840,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       createdBy: wishlist.createdBy,
                       created: wishlist.created);
                   bool? result = await updateWishlist(wishlist2);
-                  print(result);
+
                   if (result == true) {
                     Navigator.of(context).pop();
                   } else {

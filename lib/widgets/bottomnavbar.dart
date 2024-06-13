@@ -34,9 +34,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
+      height: MediaQuery.of(context).size.height*0.08,
       color: Colors.white,
       child: Container(
-        height: kToolbarHeight,
+
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[

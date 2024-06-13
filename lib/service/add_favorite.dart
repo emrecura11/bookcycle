@@ -29,10 +29,10 @@ Future<void> addFavorite(BuildContext context, String userId, int bookId) async 
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: Text("Book added to favorites successfully"),
+            content: Text("İlan favorilere eklendi!"),
             actions: [
               ElevatedButton(
-                child: Text("OK"),
+                child: Text("Tamam"),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -46,10 +46,10 @@ Future<void> addFavorite(BuildContext context, String userId, int bookId) async 
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: Text("Failed to add book to favorites!"),
+            content: Text("İlan facorilere eklenemedi!"),
             actions: [
               ElevatedButton(
-                child: Text("OK"),
+                child: Text("Tamam"),
                 onPressed: () {
                   Navigator.pop(context);
                 },

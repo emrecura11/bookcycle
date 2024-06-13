@@ -27,7 +27,25 @@ class _FilterWidgetState extends State<FilterWidget> {
     'Çocuk',
     'Felsefi',
   ];
-  List<String> cities = ['İstanbul', 'İzmir', 'Ankara', 'Antalya'];
+  List<String> cities = [
+    'Adana Province', 'Adıyaman Province', 'Afyonkarahisar Province', 'Ağrı Province', 'Amasya Province',
+    'Ankara Province', 'Antalya Province', 'Artvin Province', 'Aydın Province', 'Balıkesir Province',
+    'Bilecik Province', 'Bingöl Province', 'Bitlis Province', 'Bolu Province', 'Burdur Province',
+    'Bursa Province', 'Çanakkale Province', 'Çankırı Province', 'Çorum Province', 'Denizli Province',
+    'Diyarbakır Province', 'Edirne Province', 'Elazığ Province', 'Erzincan Province', 'Erzurum Province',
+    'Eskişehir Province', 'Gaziantep Province', 'Giresun Province', 'Gümüşhane Province', 'Hakkari Province',
+    'Hatay Province', 'Isparta Province', 'Mersin Province', 'İstanbul Province', 'İzmir Province',
+    'Kars Province', 'Kastamonu Province', 'Kayseri Province', 'Kırklareli Province', 'Kırşehir Province',
+    'Kocaeli Province', 'Konya Province', 'Kütahya Province', 'Malatya Province', 'Manisa Province',
+    'Kahramanmaraş Province', 'Mardin Province', 'Muğla Province', 'Muş Province', 'Nevşehir Province',
+    'Niğde Province', 'Ordu Province', 'Rize Province', 'Sakarya Province', 'Samsun Province',
+    'Siirt Province', 'Sinop Province', 'Sivas Province', 'Tekirdağ Province', 'Tokat Province',
+    'Trabzon Province', 'Tunceli Province', 'Şanlıurfa Province', 'Uşak Province', 'Van Province',
+    'Yozgat Province', 'Zonguldak Province', 'Aksaray Province', 'Bayburt Province', 'Karaman Province',
+    'Kırıkkale Province', 'Batman Province', 'Şırnak Province', 'Bartın Province', 'Ardahan Province',
+    'Iğdır Province', 'Yalova Province', 'Karabük Province', 'Kilis Province', 'Osmaniye Province',
+    'Düzce Province'
+  ];
   List<String> stateOfBook = ['Yeni', 'Eski', 'Yıpranmış'];
 
   List<bool> selectedGenres = List<bool>.generate(8, (_) => false);
@@ -40,6 +58,7 @@ class _FilterWidgetState extends State<FilterWidget> {
         list.add(genres[i]);
       }
     }
+
     return list;
   }
 
